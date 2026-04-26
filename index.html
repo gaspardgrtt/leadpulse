@@ -13,98 +13,117 @@
   --purple:#7c6cf5;--purple-light:#a99ff7;--green:#22c98a;--orange:#f09060;
   --text:#e8e6ff;--muted:rgba(255,255,255,.38);
 }
-body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh}
-nav{display:flex;align-items:center;justify-content:space-between;padding:16px 28px;border-bottom:1px solid var(--border)}
-.logo{font-family:'Syne',sans-serif;font-weight:800;font-size:18px;color:#fff;display:flex;align-items:center;gap:9px}
-.logo-dot{width:8px;height:8px;border-radius:50%;background:var(--purple);box-shadow:0 0 12px var(--purple)}
-.api-status{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--muted)}
-.status-dot{width:7px;height:7px;border-radius:50%;background:#555;transition:background .3s}
-.status-dot.live{background:var(--green);box-shadow:0 0 8px var(--green)}
-.search-wrap{padding:24px 28px 0}
-.search-box{display:flex;gap:10px;align-items:center}
-.search-field{flex:1;position:relative}
-.search-field input{width:100%;background:var(--surface);border:1.5px solid var(--border);border-radius:12px;padding:14px 18px 14px 48px;color:#fff;font-size:14px;font-family:'DM Sans',sans-serif;outline:none;transition:all .2s}
-.search-field input:focus{border-color:var(--border-accent);background:var(--surface2);box-shadow:0 0 0 4px rgba(120,100,255,.08)}
-.search-field input::placeholder{color:var(--muted)}
-.search-icon{position:absolute;left:16px;top:50%;transform:translateY(-50%);color:rgba(120,100,255,.6)}
-.btn-search{background:var(--purple);border:none;color:#fff;font-size:14px;font-weight:700;padding:14px 28px;border-radius:12px;cursor:pointer;font-family:'Syne',sans-serif;display:flex;align-items:center;gap:8px;transition:all .15s;white-space:nowrap}
-.btn-search:hover{background:#9488f7;transform:translateY(-1px);box-shadow:0 6px 24px rgba(120,100,255,.4)}
-.btn-search:disabled{opacity:.5;cursor:not-allowed;transform:none}
-.suggestions{display:flex;gap:7px;flex-wrap:wrap;margin-top:12px}
-.sug{font-size:11px;padding:5px 13px;border-radius:20px;border:1px solid var(--border);color:var(--muted);cursor:pointer;transition:all .18s}
-.sug:hover{border-color:rgba(120,100,255,.4);color:var(--purple-light);background:rgba(120,100,255,.07)}
-.results-wrap{padding:24px 28px}
-.results-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;display:flex;flex-direction:column}
+
+/* NAV */
+nav{display:flex;align-items:center;justify-content:space-between;padding:14px 32px;border-bottom:1px solid var(--border);background:rgba(8,8,16,.95);backdrop-filter:blur(12px);position:sticky;top:0;z-index:100}
+.logo{font-family:'Syne',sans-serif;font-weight:800;font-size:17px;color:#fff;display:flex;align-items:center;gap:8px;text-decoration:none}
+.logo-dot{width:8px;height:8px;border-radius:50%;background:var(--purple);box-shadow:0 0 10px var(--purple)}
+.nav-right{display:flex;align-items:center;gap:16px}
+.nav-link{font-size:12px;color:var(--muted);cursor:pointer;text-decoration:none;transition:color .15s}
+.nav-link:hover{color:#fff}
+.api-badge{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--muted);background:var(--surface);padding:5px 12px;border-radius:20px;border:1px solid var(--border)}
+.status-dot{width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green)}
+
+/* HERO SEARCH */
+.hero{padding:52px 32px 32px;text-align:center;max-width:680px;margin:0 auto;width:100%}
+.hero-label{font-size:11px;font-weight:700;color:var(--purple-light);text-transform:uppercase;letter-spacing:.1em;margin-bottom:14px}
+.hero-title{font-family:'Syne',sans-serif;font-size:32px;font-weight:800;color:#fff;letter-spacing:-.03em;line-height:1.15;margin-bottom:8px}
+.hero-title em{font-style:normal;background:linear-gradient(100deg,#c4b5fd,#9d8ffa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero-sub{font-size:13px;color:var(--muted);margin-bottom:28px;line-height:1.6}
+
+/* SEARCH BOX */
+.search-container{width:100%;max-width:580px;margin:0 auto}
+.search-box{display:flex;gap:0;background:var(--surface);border:1.5px solid var(--border);border-radius:14px;overflow:hidden;transition:all .2s}
+.search-box:focus-within{border-color:var(--border-accent);box-shadow:0 0 0 4px rgba(120,100,255,.1)}
+.search-icon-wrap{display:flex;align-items:center;padding:0 16px;color:rgba(120,100,255,.5)}
+.search-box input{flex:1;background:transparent;border:none;padding:15px 0;color:#fff;font-size:14px;font-family:'DM Sans',sans-serif;outline:none}
+.search-box input::placeholder{color:rgba(255,255,255,.25)}
+.btn-search{background:var(--purple);border:none;color:#fff;font-size:13px;font-weight:700;padding:0 24px;cursor:pointer;font-family:'Syne',sans-serif;display:flex;align-items:center;gap:7px;transition:all .15s;white-space:nowrap;margin:6px;border-radius:9px}
+.btn-search:hover{background:#9488f7;box-shadow:0 4px 16px rgba(120,100,255,.4)}
+.btn-search:disabled{opacity:.5;cursor:not-allowed}
+.search-hint{font-size:11px;color:rgba(255,255,255,.2);margin-top:10px;text-align:center}
+.search-hint span{color:rgba(120,100,255,.6)}
+
+/* RESULTS */
+.results-wrap{flex:1;padding:8px 32px 48px;max-width:780px;margin:0 auto;width:100%}
+.results-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;padding-bottom:14px;border-bottom:1px solid var(--border)}
 .results-count{font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:#fff}
 .results-count span{color:var(--purple-light)}
-.btn-csv{font-size:11px;padding:6px 14px;border-radius:7px;border:1px solid var(--border);color:var(--muted);background:transparent;cursor:pointer}
-.btn-csv:hover{border-color:rgba(255,255,255,.25);color:#fff}
-.leads-grid{display:flex;flex-direction:column;gap:10px}
-.lead-card{background:var(--surface);border:1px solid var(--border);border-radius:13px;padding:16px 18px;transition:all .25s;position:relative;overflow:hidden}
-.lead-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:transparent;border-radius:3px 0 0 3px;transition:background .2s}
-.lead-card:hover{border-color:rgba(120,100,255,.3);background:var(--surface2)}
-.lead-card:hover::before{background:var(--purple)}
-.lead-name{font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:#fff;margin-bottom:6px}
-.lead-meta{font-size:11px;color:var(--muted);margin-bottom:10px}
-.lead-contacts{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:10px}
-.chip{font-size:10px;padding:4px 10px;border-radius:20px;display:flex;align-items:center;gap:4px;white-space:nowrap}
-.chip-addr{background:rgba(255,255,255,.04);border:1px solid var(--border);color:rgba(255,255,255,.45)}
-.chip-tel{background:rgba(240,144,96,.07);border:1px solid rgba(240,144,96,.25);color:var(--orange)}
-.chip-web{background:rgba(120,100,255,.07);border:1px solid rgba(120,100,255,.25);color:var(--purple-light);cursor:pointer;text-decoration:none}
-.chip-none{background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.05);color:rgba(255,255,255,.2);font-style:italic}
-.state-box{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 20px;text-align:center;gap:14px}
-.state-icon{width:52px;height:52px;border-radius:14px;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:22px}
-.state-title{font-family:'Syne',sans-serif;font-weight:700;font-size:16px;color:#fff}
-.state-sub{font-size:13px;color:var(--muted);max-width:280px;line-height:1.6}
-.spinner{width:36px;height:36px;border:3px solid rgba(120,100,255,.2);border-top-color:var(--purple);border-radius:50%;animation:spin .8s linear infinite}
+.results-meta{font-size:11px;color:var(--muted);margin-top:2px}
+.btn-csv{font-size:11px;padding:7px 16px;border-radius:8px;border:1px solid var(--border);color:var(--muted);background:transparent;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:6px}
+.btn-csv:hover{border-color:rgba(255,255,255,.25);color:#fff;background:rgba(255,255,255,.04)}
+
+/* LEAD CARDS */
+.leads-grid{display:flex;flex-direction:column;gap:8px}
+.lead-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px 20px;transition:all .2s;cursor:default;display:grid;grid-template-columns:1fr auto;gap:8px;align-items:start}
+.lead-card:hover{border-color:rgba(120,100,255,.25);background:var(--surface2);transform:translateY(-1px);box-shadow:0 4px 20px rgba(0,0,0,.3)}
+.lead-left{min-width:0}
+.lead-name{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:#fff;margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lead-address{font-size:11px;color:var(--muted);margin-bottom:10px;display:flex;align-items:center;gap:5px}
+.lead-chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{font-size:10px;padding:3px 9px;border-radius:20px;display:flex;align-items:center;gap:4px;white-space:nowrap;font-weight:500}
+.chip-siret{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);color:rgba(255,255,255,.4)}
+.chip-naf{background:rgba(120,100,255,.08);border:1px solid rgba(120,100,255,.2);color:var(--purple-light)}
+.chip-none{background:transparent;border:1px solid rgba(255,255,255,.05);color:rgba(255,255,255,.18);font-style:italic}
+.lead-right{display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0}
+.maps-btn{font-size:10px;color:rgba(120,100,255,.6);text-decoration:none;display:flex;align-items:center;gap:4px;transition:color .15s;white-space:nowrap}
+.maps-btn:hover{color:var(--purple-light)}
+
+/* STATES */
+.state-box{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px 20px;text-align:center;gap:12px}
+.state-emoji{font-size:36px;margin-bottom:4px}
+.state-title{font-family:'Syne',sans-serif;font-weight:700;font-size:17px;color:#fff}
+.state-sub{font-size:13px;color:var(--muted);max-width:300px;line-height:1.6}
+.spinner{width:32px;height:32px;border:2.5px solid rgba(120,100,255,.2);border-top-color:var(--purple);border-radius:50%;animation:spin .7s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
-#toast{position:fixed;bottom:24px;right:24px;background:#fff;color:#0a0a0f;font-size:12px;font-weight:600;padding:10px 18px;border-radius:8px;transform:translateY(60px);transition:transform .3s;z-index:999;box-shadow:0 8px 30px rgba(0,0,0,.4)}
-#toast.show{transform:translateY(0)}
+
+/* TOAST */
+#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:#fff;color:#0a0a0f;font-size:12px;font-weight:600;padding:10px 20px;border-radius:20px;transition:transform .3s;z-index:999;box-shadow:0 8px 30px rgba(0,0,0,.4);white-space:nowrap}
+#toast.show{transform:translateX(-50%) translateY(0)}
 </style>
 </head>
 <body>
+
 <nav>
-  <div class="logo"><div class="logo-dot"></div>LeadPulse</div>
-  <div class="api-status">
-    <div class="status-dot live" id="status-dot"></div>
-    <span id="status-text">API connectée</span>
+  <a class="logo" href="/landing.html">
+    <div class="logo-dot"></div>
+    LeadPulse
+  </a>
+  <div class="nav-right">
+    <a class="nav-link" href="/landing.html">Accueil</a>
+    <div class="api-badge">
+      <div class="status-dot"></div>
+      API connectée
+    </div>
   </div>
 </nav>
-<div class="search-wrap">
-  <div class="search-box">
-    <div class="search-field">
-      <svg class="search-icon" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
-      <input type="text" id="search-input" placeholder="Ex : coiffeur La Rochelle, restaurant Bordeaux..." onkeydown="if(event.key==='Enter')doSearch()">
+
+<div class="hero">
+  <div class="hero-label">Moteur de prospection</div>
+  <h1 class="hero-title">Trouvez vos prospects.<br><em>En quelques secondes.</em></h1>
+  <p class="hero-sub">Tapez un secteur et une ville — on interroge la base officielle des entreprises françaises.</p>
+  <div class="search-container">
+    <div class="search-box">
+      <div class="search-icon-wrap">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+      </div>
+      <input type="text" id="search-input" placeholder="Ex : coiffeur La Rochelle, avocat Bordeaux..." onkeydown="if(event.key==='Enter')doSearch()" autofocus>
+      <button class="btn-search" id="search-btn" onclick="doSearch()">
+        <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+        Chercher
+      </button>
     </div>
-    <button class="btn-search" id="search-btn" onclick="doSearch()">
-      <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
-      Chercher
-    </button>
-  </div>
-  <div class="suggestions">
-    <span class="sug" onclick="setSearch('coiffeur La Rochelle')">💈 Coiffeur La Rochelle</span>
-    <span class="sug" onclick="setSearch('restaurant Bordeaux')">🍽 Restaurant Bordeaux</span>
-    <span class="sug" onclick="setSearch('coach sportif Lyon')">💪 Coach Lyon</span>
-    <span class="sug" onclick="setSearch('avocat Paris')">⚖️ Avocat Paris</span>
-    <span class="sug" onclick="setSearch('agence immobilière Nantes')">🏠 Immo Nantes</span>
-    <span class="sug" onclick="setSearch('photographe Marseille')">📸 Photo Marseille</span>
+    <div class="search-hint">Essaie : <span>coiffeur La Rochelle</span> · <span>restaurant Bordeaux</span> · <span>avocat Paris</span></div>
   </div>
 </div>
-<div class="results-wrap" id="results-wrap">
-  <div class="state-box">
-    <div class="state-icon">🔍</div>
-    <div class="state-title">Prêt à chercher</div>
-    <div class="state-sub">Entre un secteur + une ville et obtiens tous les prospects avec leurs contacts.</div>
-  </div>
-</div>
+
+<div class="results-wrap" id="results-wrap"></div>
+
 <div id="toast"></div>
+
 <script>
 let currentLeads = [];
-
-function setSearch(q){
-  document.getElementById('search-input').value = q;
-  doSearch();
-}
 
 async function doSearch(){
   const q = document.getElementById('search-input').value.trim();
@@ -119,9 +138,8 @@ async function doSearch(){
     });
     const data = await res.json();
     if(!res.ok) throw new Error(data.error || 'Erreur API');
-    const leads = data.places || [];
-    currentLeads = leads;
-    renderResults(leads, q);
+    currentLeads = data.places || [];
+    renderResults(currentLeads, q);
   } catch(e) {
     showError(e.message);
   }
@@ -131,17 +149,15 @@ async function doSearch(){
 function renderResults(leads, query){
   const wrap = document.getElementById('results-wrap');
   if(!leads.length){
-    wrap.innerHTML = '<div class="state-box"><div class="state-icon">😶</div><div class="state-title">Aucun résultat</div><div class="state-sub">Essaie une autre ville ou un autre secteur.</div></div>';
+    wrap.innerHTML = '<div class="state-box"><div class="state-emoji">😶</div><div class="state-title">Aucun résultat</div><div class="state-sub">Essaie une autre ville ou un autre secteur.</div></div>';
     return;
   }
-  let html = '<div class="results-header"><div class="results-count"><span>'+leads.length+'</span> leads trouvés pour "'+query+'"</div><button class="btn-csv" onclick="exportCSV()">↓ Exporter CSV</button></div><div class="leads-grid">';
-  leads.forEach((l, i) => {
-    const telChip = l.phone ? '<span class="chip chip-tel">📞 '+l.phone+'</span>' : '<span class="chip chip-none">Pas de tél.</span>';
-    const webChip = l.website ? '<a class="chip chip-web" href="'+l.website+'" target="_blank">🌐 '+l.website.replace(/https?:\/\/(www\.)?/,'').slice(0,30)+'</a>' : '<span class="chip chip-none">Pas de site</span>';
-    const siretChip = l.siret ? '<span class="chip chip-addr">🏢 '+l.siret+'</span>' : '';
-    const nafChip = l.nafLabel ? '<span class="chip chip-addr" style="color:var(--purple-light)">📋 '+l.nafLabel+'</span>' : '';
-    const mapsLink = l.mapsUrl ? '<a href="'+l.mapsUrl+'" target="_blank" style="font-size:10px;color:var(--muted);text-decoration:none">Voir sur Maps →</a>' : '';
-    html += '<div class="lead-card"><div class="lead-name">'+l.name+'</div><div class="lead-meta">'+l.address+'</div><div class="lead-contacts">'+telChip+webChip+siretChip+nafChip+'</div><div style="display:flex;justify-content:flex-end">'+mapsLink+'</div></div>';
+  let html = '<div class="results-header"><div><div class="results-count"><span>'+leads.length+'</span> leads trouvés pour "'+query+'"</div><div class="results-meta">Source : Registre officiel des entreprises françaises</div></div><button class="btn-csv" onclick="exportCSV()"><svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg> Exporter CSV</button></div><div class="leads-grid">';
+  leads.forEach(function(l) {
+    var siretChip = l.siret ? '<span class="chip chip-siret">🏢 '+l.siret+'</span>' : '';
+    var nafChip = l.nafLabel ? '<span class="chip chip-naf">'+l.nafLabel+'</span>' : '';
+    var mapsBtn = l.mapsUrl ? '<a class="maps-btn" href="'+l.mapsUrl+'" target="_blank"><svg width="10" height="10" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>Maps</a>' : '';
+    html += '<div class="lead-card"><div class="lead-left"><div class="lead-name">'+l.name+'</div><div class="lead-address"><svg width="10" height="10" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>'+l.address+'</div><div class="lead-chips">'+siretChip+nafChip+'</div></div><div class="lead-right">'+mapsBtn+'</div></div>';
   });
   html += '</div>';
   wrap.innerHTML = html;
@@ -149,9 +165,9 @@ function renderResults(leads, query){
 
 function exportCSV(){
   if(!currentLeads.length){ toast('Aucun lead à exporter'); return; }
-  const rows = [['Nom','Adresse','Téléphone','Site web','SIRET','Secteur']];
-  currentLeads.forEach(l => rows.push(['"'+l.name+'"','"'+l.address+'"',l.phone,l.website,l.siret,l.nafLabel]));
-  const csv = rows.map(r=>r.join(',')).join('\n');
+  const rows = [['Nom','Adresse','SIRET','Secteur']];
+  currentLeads.forEach(function(l){ rows.push(['"'+l.name+'"','"'+l.address+'"',l.siret,'"'+l.nafLabel+'"']); });
+  const csv = rows.map(function(r){return r.join(',');}).join('\n');
   const blob = new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8'});
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
@@ -162,21 +178,20 @@ function exportCSV(){
 
 function setLoading(on){
   const btn = document.getElementById('search-btn');
-  const wrap = document.getElementById('results-wrap');
   btn.disabled = on;
-  btn.innerHTML = on ? '<div class="spinner" style="width:16px;height:16px;border-width:2px"></div> Recherche…' : '<svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg> Chercher';
-  if(on) wrap.innerHTML = '<div class="state-box"><div class="spinner"></div><div class="state-title">Recherche en cours…</div><div class="state-sub">On interroge les données publiques françaises.</div></div>';
+  btn.innerHTML = on ? '<div class="spinner" style="width:14px;height:14px;border-width:2px"></div>' : '<svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg> Chercher';
+  if(on) document.getElementById('results-wrap').innerHTML = '<div class="state-box"><div class="spinner"></div><div class="state-title" style="margin-top:16px">Recherche en cours…</div><div class="state-sub">On interroge la base officielle des entreprises françaises.</div></div>';
 }
 
 function showError(msg){
-  document.getElementById('results-wrap').innerHTML = '<div class="state-box"><div class="state-icon">⚠️</div><div class="state-title">Erreur</div><div class="state-sub">'+msg+'</div></div>';
+  document.getElementById('results-wrap').innerHTML = '<div class="state-box"><div class="state-emoji">⚠️</div><div class="state-title">Erreur</div><div class="state-sub">'+msg+'</div></div>';
 }
 
 function toast(msg){
   const t = document.getElementById('toast');
   t.textContent = msg;
   t.classList.add('show');
-  setTimeout(()=>t.classList.remove('show'), 2500);
+  setTimeout(function(){t.classList.remove('show');}, 2500);
 }
 </script>
 </body>
