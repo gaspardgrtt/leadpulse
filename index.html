@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LeadPulse — Recherche de leads</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased}
+:root{
+  --bg:#080810;
+  --surface:#0f0f1c;
+  --surface2:#141428;
+  --border:rgba(255,255,255,.07);
+  --border-accent:rgba(120,100,255,.4);
+  --purple:#7c6cf5;
+  --purple-light:#a99ff7;
+  --green:#22c98a;
+  --orange:#f09060;
+  --text:#e8e6ff;
+  --muted:rgba(255,255,255,.38);
+  --faint:rgba(255,255,255,.12);
+}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh}
+
+/* ── NAV ── */
+nav{display:flex;align-items:center;justify-content:space-between;padding:16px 28px;border-bottom:1px solid var(--border)}
+.logo{font-family:'Syne',sans-serif;font-weight:800;font-size:18px;color:#fff;display:flex;align-items:center;gap:9px}
+.logo-dot{width:8px;height:8px;border-radius:50%;background:var(--purple);box-shadow:0 0 12px var(--purple)}
+.api-status{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--muted)}
+.status-dot{width:7px;height:7px;border-radius:50%;background:#555;transition:background .3s}
+.status-dot.live{background:var(--green);box-shadow:0 0 8px var(--green)}
+
+/* ── SETUP BANNER ── */
+#setup-banner{background:linear-gradient(135deg,rgba(120,100,255,.12),rgba(120,100,255,.05));border:1px solid var(--border-accent);border-radius:14px;margin:24px 28px;padding:20px 24px}
+.setup-title{font-family:'Syne',sans-serif;font-weight:700;font-size:15px;color:#fff;margin-bottom:8px}
+.setup-steps{font-size:12px;color:rgba(255,255,255,.55);line-height:2;margin-bottom:16px}
+.setup-steps a{color:var(--purple-light);text-decoration:none}
+.setup-steps a:hover{text-decoration:underline}
+.key-row{display:flex;gap:10px}
+#api-key-input{flex:1;background:rgba(255,255,255,.06);border:1.5px solid rgba(120,100,255,.35);border-radius:9px;padding:11px 16px;color:#fff;font-size:13px;font-family:'DM Sans',sans-serif;outline:none;transition:border .2s}
+#api-key-input:focus{border-color:var(--purple)}
+#api-key-input::placeholder{color:rgba(255,255,255,.25)}
+.btn-save{background:var(--purple);border:none;color:#fff;font-size:13px;font-weight:600;padding:11px 22px;border-radius:9px;cursor:pointer;font-family:'Syne',sans-serif;transition:all .15s;white-space:nowrap}
+.btn-save:hover{background:#9488f7;box-shadow:0 4px 20px rgba(120,100,255,.4)}
+
+/* ── SEARCH BAR ── */
+.search-wrap{padding:24px 28px 0}
+.search-box{display:flex;gap:10px;align-items:center}
+.search-field{flex:1;position:relative}
+.search-field input{width:100%;background:var(--surface);border:1.5px solid var(--border);border-radius:12px;padding:14px 18px 14px 48px;color:#fff;font-size:14px;font-family:'DM Sans',sans-serif;outline:none;transition:all .2s}
+.search-field input:focus{border-color:var(--border-accent);background:var(--surface2);box-shadow:0 0 0 4px rgba(120,100,255,.08)}
+.search-field input::placeholder{color:var(--muted)}
+.search-icon{position:absolute;left:16px;top:50%;transform:translateY(-50%);color:rgba(120,100,255,.6)}
+.btn-search{background:var(--purple);border:none;color:#fff;font-size:14px;font-weight:700;padding:14px 28px;border-radius:12px;cursor:pointer;font-family:'Syne',sans-serif;display:flex;align-items:center;gap:8px;transition:all .15s;white-space:nowrap}
+.btn-search:hover{background:#9488f7;transform:translateY(-1px);box-shadow:0 6px 24px rgba(120,100,255,.4)}
+.btn-search:active{transform:scale(.98)}
+.btn-search:disabled{opacity:.5;cursor:not-allowed;transform:none}
+
+/* Quick suggestions */
+.suggestions{display:flex;gap:7px;flex-wrap:wrap;margin-top:12px}
+.sug{font-size:11px;padding:5px 13px;border-radius:20px;border:1px solid var(--border);color:var(--muted);cursor:pointer;transition:all .18s;background:transparent}
+.sug:hover{border-color:rgba(120,100,255,.4);color:var(--purple-light);background:rgba(120,100,255,.07)}
+
+/* ── RESULTS ── */
+.results-wrap{padding:24px 28px}
+.results-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.results-count{font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:#fff}
+.results-count span{color:var(--purple-light)}
+.btn-csv{font-size:11px;padding:6px 14px;border-radius:7px;border:1px solid var(--border);color:var(--muted);background:transparent;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:5px}
+.btn-csv:hover{border-color:rgba(255,255,255,.25);color:#fff}
+
+/* Lead cards */
+.leads-grid{display:flex;flex-direction:column;gap:10px}
+.lead-card{background:var(--surface);border:1px solid var(--border);border-radius:13px;padding:16px 18px;transition:all .25s;position:relative;overflow:hidden}
+.lead-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:transparent;border-radius:3px 0 0 3px;transition:background .2s}
+.lead-card:hover{border-color:rgba(120,100,255,.3);background:var(--surface2)}
+.lead-card:hover::before{background:var(--purple)}
+.lead-card.analyzing{border-color:rgba(120,100,255,.25);animation:pulse-border 2s ease-in-out infinite}
+@keyframes pulse-border{0%,100%{border-color:rgba(120,100,255,.15)}50%{border-color:rgba(120,100,255,.4)}}
+
+.lead-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px;gap:12px}
+.lead-name{font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:#fff}
+.lead-rating{display:flex;align-items:center;gap:4px;font-size:11px;color:#f5c842;flex-shrink:0}
+.lead-meta{font-size:11px;color:var(--muted);margin-bottom:10px;line-height:1.5}
+
+.lead-contacts{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:10px}
+.chip{font-size:10px;padding:4px 10px;border-radius:20px;display:flex;align-items:center;gap:4px;white-space:nowrap}
+.chip-addr{background:rgba(255,255,255,.04);border:1px solid var(--border);color:rgba(255,255,255,.45)}
+.chip-tel{background:rgba(240,144,96,.07);border:1px solid rgba(240,144,96,.25);color:var(--orange)}
+.chip-web{background:rgba(120,100,255,.07);border:1px solid rgba(120,100,255,.25);color:var(--purple-light);cursor:pointer;text-decoration:none}
+.chip-web:hover{background:rgba(120,100,255,.15)}
+.chip-none{background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.05);color:rgba(255,255,255,.2);font-style:italic}
+
+/* Analysis block */
+.lead-analysis{background:rgba(120,100,255,.05);border:1px solid rgba(120,100,255,.18);border-radius:8px;padding:11px 13px;margin-top:8px;font-size:11px;line-height:1.7;color:rgba(255,255,255,.65)}
+.analysis-header{display:flex;align-items:center;gap:6px;margin-bottom:7px;font-size:10px;font-weight:700;color:var(--purple-light);text-transform:uppercase;letter-spacing:.06em}
+.analysis-loader{display:flex;gap:4px;align-items:center;padding:8px 0}
+.a-dot{width:5px;height:5px;border-radius:50%;background:var(--purple);animation:ai-dot 1.2s ease-in-out infinite}
+.a-dot:nth-child(2){animation-delay:.2s}
+.a-dot:nth-child(3){animation-delay:.4s}
+@keyframes ai-dot{0%,80%,100%{transform:scale(.5);opacity:.3}40%{transform:scale(1);opacity:1}}
+.flaw{display:flex;align-items:flex-start;gap:6px;margin-bottom:4px}
+.flaw-icon{color:#f06060;flex-shrink:0;margin-top:1px}
+.btn-analyze{font-size:10px;padding:5px 12px;border-radius:6px;background:transparent;border:1px solid rgba(120,100,255,.35);color:var(--purple-light);cursor:pointer;transition:all .15s;font-family:'DM Sans',sans-serif}
+.btn-analyze:hover{background:rgba(120,100,255,.12);border-color:var(--purple)}
+
+/* Empty / loading states */
+.state-box{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 20px;text-align:center;gap:14px}
+.state-icon{width:52px;height:52px;border-radius:14px;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:22px}
+.state-title{font-family:'Syne',sans-serif;font-weight:700;font-size:16px;color:#fff}
+.state-sub{font-size:13px;color:var(--muted);max-width:280px;line-height:1.6}
+.spinner{width:36px;height:36px;border:3px solid rgba(120,100,255,.2);border-top-color:var(--purple);border-radius:50%;animation:spin 0.8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* Loading skeleton */
+.skeleton{background:linear-gradient(90deg,var(--surface) 25%,var(--surface2) 50%,var(--surface) 75%);background-size:200% 100%;animation:shimmer 1.4s infinite;border-radius:6px}
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+
+/* Toast */
+#toast{position:fixed;bottom:24px;right:24px;background:#fff;color:#0a0a0f;font-size:12px;font-weight:600;padding:10px 18px;border-radius:8px;transform:translateY(60px);transition:transform .3s;z-index:999;box-shadow:0 8px 30px rgba(0,0,0,.4)}
+#toast.show{transform:translateY(0)}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="logo">
+    <div class="logo-dot"></div>
+    LeadPulse
+  </div>
+  <div class="api-status">
+    <div class="status-dot" id="status-dot"></div>
+    <span id="status-text">Clé API non configurée</span>
+  </div>
+</nav>
+
+<!-- SEARCH -->
+<div class="search-wrap">
+  <div class="search-box">
+    <div class="search-field">
+      <svg class="search-icon" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+      <input type="text" id="search-input" placeholder="Ex : coiffeur La Rochelle, restaurant Bordeaux..." onkeydown="if(event.key==='Enter')doSearch()">
+    </div>
+    <button class="btn-search" id="search-btn" onclick="doSearch()">
+      <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+      Chercher
+    </button>
+  </div>
+  <div class="suggestions">
+    <span class="sug" onclick="setSearch('coiffeur La Rochelle')">💈 Coiffeur La Rochelle</span>
+    <span class="sug" onclick="setSearch('restaurant Bordeaux')">🍽 Restaurant Bordeaux</span>
+    <span class="sug" onclick="setSearch('coach sportif Lyon')">💪 Coach Lyon</span>
+    <span class="sug" onclick="setSearch('avocat Paris')">⚖️ Avocat Paris</span>
+    <span class="sug" onclick="setSearch('agence immobilière Nantes')">🏠 Immo Nantes</span>
+    <span class="sug" onclick="setSearch('photographe Marseille')">📸 Photo Marseille</span>
+  </div>
+</div>
+
+<!-- RESULTS -->
+<div class="results-wrap" id="results-wrap">
+  <div class="state-box" id="empty-state">
+    <div class="state-icon">🔍</div>
+    <div class="state-title">Prêt à chercher</div>
+    <div class="state-sub">Entre un secteur + une ville et obtiens tous les prospects avec leurs contacts.</div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+// ── CONFIG ──
+const PROXY = 'https://corsproxy.io/?';
+const apiKey = 'AIzaSyCeP4AueVwU4ww2O0i3uJkejhsp5Qer6UY';
+let currentLeads = [];
+
+// Init
+setStatus(true);
+
+function setStatus(live){
+  document.getElementById('status-dot').className = 'status-dot' + (live?' live':'');
+  document.getElementById('status-text').textContent = live ? 'API connectée' : 'Clé API non configurée';
+}
+
+function setSearch(q){
+  document.getElementById('search-input').value = q;
+  doSearch();
+}
+
+// ── SEARCH ──
+async function doSearch(){
+  if(!apiKey){
+    toast('⚠️ Configure ta clé API d\'abord');
+    document.getElementById('setup-banner').style.display = 'block';
+    return;
+  }
+  const q = document.getElementById('search-input').value.trim();
+  if(!q){ toast('Entre un secteur et une ville'); return; }
+
+  setLoading(true);
+  currentLeads = [];
+
+  try {
+    const results = await searchPlaces(q);
+    currentLeads = results;
+    renderResults(results, q);
+  } catch(e) {
+    showError(e.message);
+  }
+  setLoading(false);
+}
+
+async function searchPlaces(query){
+  const target = `https://places.googleapis.com/v1/places:searchText`;
+  const url = `https://corsproxy.io/?url=${encodeURIComponent(target)}`;
+  const body = {
+    textQuery: query,
+    languageCode: 'fr',
+    maxResultCount: 20,
+  };
+
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Goog-Api-Key': apiKey,
+      'X-Goog-FieldMask': 'places.displayName,places.formattedAddress,places.nationalPhoneNumber,places.websiteUri,places.rating,places.userRatingCount,places.businessStatus,places.types,places.googleMapsUri'
+    },
+    body: JSON.stringify(body)
+  });
+
+  if(!res.ok){
+    const err = await res.json();
+    const msg = err?.error?.message || 'Erreur API';
+    if(msg.includes('API_KEY')) throw new Error('Clé API invalide ou Places API non activée');
+    throw new Error(msg);
+  }
+
+  const data = await res.json();
+  if(!data.places || data.places.length === 0) return [];
+
+  return data.places.map(p => ({
+    name: p.displayName?.text || '—',
+    address: p.formattedAddress || '',
+    phone: p.nationalPhoneNumber || '',
+    website: p.websiteUri || '',
+    rating: p.rating || null,
+    reviewCount: p.userRatingCount || 0,
+    mapsUrl: p.googleMapsUri || '',
+    status: p.businessStatus || '',
+    types: p.types || [],
+    analysis: null,
+  }));
+}
+
+// ── RENDER ──
+function renderResults(leads, query){
+  const wrap = document.getElementById('results-wrap');
+
+  if(leads.length === 0){
+    wrap.innerHTML = `<div class="state-box"><div class="state-icon">😶</div><div class="state-title">Aucun résultat</div><div class="state-sub">Essaie une autre ville ou un autre secteur.</div></div>`;
+    return;
+  }
+
+  let html = `<div class="results-header">
+    <div class="results-count"><span>${leads.length}</span> leads trouvés pour "${query}"</div>
+    <button class="btn-csv" onclick="exportCSV()">↓ Exporter CSV</button>
+  </div><div class="leads-grid" id="leads-grid">`;
+
+  leads.forEach((l, i) => {
+    const stars = l.rating ? '⭐'.repeat(Math.round(l.rating)) + ` <span style="color:var(--muted)">${l.rating} (${l.reviewCount} avis)</span>` : '<span style="color:var(--muted)">Pas de note</span>';
+    const websiteChip = l.website
+      ? `<a class="chip chip-web" href="${l.website}" target="_blank">🌐 ${new URL(l.website).hostname.replace('www.','')}</a>`
+      : `<span class="chip chip-none">Pas de site</span>`;
+    const telChip = l.phone
+      ? `<span class="chip chip-tel">📞 ${l.phone}</span>`
+      : `<span class="chip chip-none">Pas de tél.</span>`;
+    const addrChip = l.address
+      ? `<span class="chip chip-addr">📍 ${l.address}</span>`
+      : '';
+
+    const analyzeBtn = l.website
+      ? `<button class="btn-analyze" onclick="analyzeWebsite(${i})">✦ Analyser le site</button>`
+      : `<span style="font-size:10px;color:var(--muted)">Pas de site à analyser</span>`;
+
+    html += `<div class="lead-card" id="card-${i}">
+      <div class="lead-top">
+        <div class="lead-name">${l.name}</div>
+        <div class="lead-rating">${stars}</div>
+      </div>
+      <div class="lead-meta">${l.address}</div>
+      <div class="lead-contacts">
+        ${telChip}
+        ${websiteChip}
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between">
+        ${analyzeBtn}
+        ${l.mapsUrl ? `<a href="${l.mapsUrl}" target="_blank" style="font-size:10px;color:var(--muted);text-decoration:none">Voir sur Maps →</a>` : ''}
+      </div>
+      <div id="analysis-${i}"></div>
+    </div>`;
+  });
+
+  html += '</div>';
+  wrap.innerHTML = html;
+}
+
+// ── WEBSITE ANALYSIS via Claude ──
+async function analyzeWebsite(idx){
+  const lead = currentLeads[idx];
+  if(!lead.website) return;
+
+  const card = document.getElementById('card-'+idx);
+  const analysisDiv = document.getElementById('analysis-'+idx);
+  card.classList.add('analyzing');
+
+  analysisDiv.innerHTML = `<div class="lead-analysis">
+    <div class="analysis-header"><svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg> Analyse IA en cours…</div>
+    <div class="analysis-loader"><div class="a-dot"></div><div class="a-dot"></div><div class="a-dot"></div></div>
+  </div>`;
+
+  try {
+    // Fetch the website content via CORS proxy
+    let siteContent = '';
+    try {
+      const siteRes = await fetch(PROXY + encodeURIComponent(lead.website), { signal: AbortSignal.timeout(8000) });
+      const html = await siteRes.text();
+      // Extract visible text only, strip tags
+      siteContent = html.replace(/<script[^>]*>[\s\S]*?<\/script>/gi,'')
+                        .replace(/<style[^>]*>[\s\S]*?<\/style>/gi,'')
+                        .replace(/<[^>]+>/g,' ')
+                        .replace(/\s+/g,' ')
+                        .trim()
+                        .slice(0, 3000);
+    } catch(e) {
+      siteContent = `Site: ${lead.website} — Impossible de charger le contenu.`;
+    }
+
+    // Call Claude via Anthropic API
+    const prompt = `Tu es un expert en prospection commerciale et en marketing digital. Analyse ce site web d'entreprise et identifie 3 à 4 faiblesses concrètes qu'un prestataire pourrait utiliser pour proposer ses services lors d'un cold call ou email de prospection.
+
+Entreprise : ${lead.name}
+Site : ${lead.website}
+Contenu du site : ${siteContent}
+
+Réponds UNIQUEMENT en JSON valide, sans markdown, sans explication, avec ce format exact :
+{"flaws": ["faiblesse 1", "faiblesse 2", "faiblesse 3"], "pitch": "phrase d'accroche en 1 phrase pour le cold call"}`;
+
+    const claudeRes = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+
+    const claudeData = await claudeRes.json();
+    const raw = claudeData.content?.[0]?.text || '{}';
+    let parsed;
+    try { parsed = JSON.parse(raw.replace(/```json|```/g,'').trim()); }
+    catch(e) { parsed = { flaws: ['Analyse indisponible'], pitch: '' }; }
+
+    const flawsHtml = (parsed.flaws || []).map(f =>
+      `<div class="flaw"><span class="flaw-icon">✗</span><span>${f}</span></div>`
+    ).join('');
+
+    analysisDiv.innerHTML = `<div class="lead-analysis">
+      <div class="analysis-header">
+        <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+        Analyse IA · Points faibles détectés
+      </div>
+      ${flawsHtml}
+      ${parsed.pitch ? `<div style="margin-top:10px;padding-top:10px;border-top:1px solid rgba(120,100,255,.15)">
+        <span style="font-size:9px;color:var(--purple-light);font-weight:700;text-transform:uppercase;letter-spacing:.06em">Accroche cold call :</span>
+        <div style="margin-top:4px;color:rgba(255,255,255,.8);font-size:11px;line-height:1.6">"${parsed.pitch}"</div>
+        <button onclick="copyPitch('${parsed.pitch.replace(/'/g,"\\'")}', this)" style="margin-top:8px;font-size:9px;padding:4px 10px;border-radius:5px;background:rgba(120,100,255,.15);border:1px solid rgba(120,100,255,.3);color:var(--purple-light);cursor:pointer">Copier l'accroche</button>
+      </div>` : ''}
+    </div>`;
+
+    currentLeads[idx].analysis = parsed;
+    card.classList.remove('analyzing');
+
+  } catch(e) {
+    analysisDiv.innerHTML = `<div class="lead-analysis" style="color:rgba(255,100,100,.7)">Erreur : ${e.message}</div>`;
+    card.classList.remove('analyzing');
+  }
+}
+
+function copyPitch(text, btn){
+  navigator.clipboard.writeText(text).then(()=>{
+    btn.textContent = '✓ Copié !';
+    btn.style.background = 'rgba(34,201,138,.15)';
+    btn.style.borderColor = 'rgba(34,201,138,.4)';
+    btn.style.color = 'var(--green)';
+    setTimeout(()=>{
+      btn.textContent = "Copier l'accroche";
+      btn.style.background = '';
+      btn.style.borderColor = '';
+      btn.style.color = '';
+    }, 2000);
+  });
+}
+
+// ── EXPORT CSV ──
+function exportCSV(){
+  if(!currentLeads.length){ toast('Aucun lead à exporter'); return; }
+  const rows = [['Nom','Adresse','Téléphone','Site web','Note','Nb avis','Google Maps']];
+  currentLeads.forEach(l => rows.push([
+    `"${l.name}"`, `"${l.address}"`, l.phone, l.website,
+    l.rating || '', l.reviewCount || '', l.mapsUrl
+  ]));
+  const csv = rows.map(r => r.join(',')).join('\n');
+  const blob = new Blob(['\uFEFF'+csv], {type:'text/csv;charset=utf-8'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'leads_leadpulse.csv'; a.click();
+  URL.revokeObjectURL(url);
+  toast('✓ CSV exporté');
+}
+
+// ── UI helpers ──
+function setLoading(on){
+  const btn = document.getElementById('search-btn');
+  const wrap = document.getElementById('results-wrap');
+  btn.disabled = on;
+  btn.innerHTML = on
+    ? '<div class="spinner" style="width:16px;height:16px;border-width:2px"></div> Recherche…'
+    : '<svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg> Chercher';
+  if(on) wrap.innerHTML = `<div class="state-box"><div class="spinner"></div><div class="state-title">Recherche en cours…</div><div class="state-sub">On interroge Google Places pour toi.</div></div>`;
+}
+
+function showError(msg){
+  document.getElementById('results-wrap').innerHTML = `<div class="state-box"><div class="state-icon">⚠️</div><div class="state-title">Erreur</div><div class="state-sub">${msg}</div></div>`;
+}
+
+function toast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 2500);
+}
+</script>
+</body>
+</html>
