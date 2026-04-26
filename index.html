@@ -211,22 +211,10 @@ async function doSearch(){
 }
 
 async function searchPlaces(query){
-  const target = `https://places.googleapis.com/v1/places:searchText`;
-  const url = `https://corsproxy.io/?url=${encodeURIComponent(target)}`;
-  const body = {
-    textQuery: query,
-    languageCode: 'fr',
-    maxResultCount: 20,
-  };
-
-  const res = await fetch(url, {
+  const res = await fetch('/api/search', {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'X-Goog-Api-Key': apiKey,
-      'X-Goog-FieldMask': 'places.displayName,places.formattedAddress,places.nationalPhoneNumber,places.websiteUri,places.rating,places.userRatingCount,places.businessStatus,places.types,places.googleMapsUri'
-    },
-    body: JSON.stringify(body)
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ query })
   });
 
   if(!res.ok){
