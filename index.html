@@ -228,15 +228,15 @@ async function searchPlaces(query){
   if(!data.places || data.places.length === 0) return [];
 
   return data.places.map(p => ({
-    name: p.displayName?.text || '—',
-    address: p.formattedAddress || '',
-    phone: p.nationalPhoneNumber || '',
-    website: p.websiteUri || '',
-    rating: p.rating || null,
-    reviewCount: p.userRatingCount || 0,
-    mapsUrl: p.googleMapsUri || '',
-    status: p.businessStatus || '',
-    types: p.types || [],
+    name: p.name || '—',
+    address: p.address || '',
+    phone: p.phone || '',
+    website: p.website || '',
+    rating: null,
+    reviewCount: 0,
+    mapsUrl: p.mapsUrl || '',
+    siret: p.siret || '',
+    nafLabel: p.nafLabel || '',
     analysis: null,
   }));
 }
