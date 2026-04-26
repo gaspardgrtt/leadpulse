@@ -256,32 +256,35 @@ function renderResults(leads, query){
   </div><div class="leads-grid" id="leads-grid">`;
 
   leads.forEach((l, i) => {
-    const stars = l.rating ? '⭐'.repeat(Math.round(l.rating)) + ` <span style="color:var(--muted)">${l.rating} (${l.reviewCount} avis)</span>` : '<span style="color:var(--muted)">Pas de note</span>';
     const websiteChip = l.website
-      ? `<a class="chip chip-web" href="${l.website}" target="_blank">🌐 ${new URL(l.website).hostname.replace('www.','')}</a>`
+      ? `<a class="chip chip-web" href="${l.website}" target="_blank">🌐 ${(() => { try { return new URL(l.website).hostname.replace('www.',''); } catch(e) { return l.website; } })()}</a>`
       : `<span class="chip chip-none">Pas de site</span>`;
     const telChip = l.phone
       ? `<span class="chip chip-tel">📞 ${l.phone}</span>`
       : `<span class="chip chip-none">Pas de tél.</span>`;
-    const addrChip = l.address
-      ? `<span class="chip chip-addr">📍 ${l.address}</span>`
+    const siretChip = l.siret
+      ? `<span class="chip chip-addr">🏢 SIRET ${l.siret}</span>`
+      : '';
+    const nafChip = l.nafLabel
+      ? `<span class="chip chip-addr" style="color:var(--purple-light);border-color:rgba(120,100,255,.25)">📋 ${l.nafLabel}</span>`
       : '';
 
     const analyzeBtn = l.website
       ? `<button class="btn-analyze" onclick="analyzeWebsite(${i})">✦ Analyser le site</button>`
-      : `<span style="font-size:10px;color:var(--muted)">Pas de site à analyser</span>`;
+      : `<span style="font-size:10px;color:var(--muted)">Pas de site renseigné</span>`;
 
     html += `<div class="lead-card" id="card-${i}">
       <div class="lead-top">
         <div class="lead-name">${l.name}</div>
-        <div class="lead-rating">${stars}</div>
       </div>
       <div class="lead-meta">${l.address}</div>
       <div class="lead-contacts">
         ${telChip}
         ${websiteChip}
+        ${siretChip}
+        ${nafChip}
       </div>
-      <div style="display:flex;align-items:center;justify-content:space-between">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-top:4px">
         ${analyzeBtn}
         ${l.mapsUrl ? `<a href="${l.mapsUrl}" target="_blank" style="font-size:10px;color:var(--muted);text-decoration:none">Voir sur Maps →</a>` : ''}
       </div>
