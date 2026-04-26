@@ -11,85 +11,36 @@ export default async function handler(req, res) {
 
   try {
     const words = query.trim().split(' ');
-    const activite = words[0];
     const ville = words.slice(1).join(' ');
 
-    const nafMap = {
-      coiffeur: '96.02A', coiffeuse: '96.02A',
-      restaurant: '56.10A', brasserie: '56.10A',
-      boulangerie: '10.71C', boulanger: '10.71C',
-      pharmacie: '47.73Z', pharmacien: '47.73Z',
-      dentiste: '86.23Z', medecin: '86.21Z',
-      photographe: '74.20Z', avocat: '69.10Z',
-      comptable: '69.20Z', architecte: '71.11Z',
-      notaire: '69.10Z', opticien: '47.78A',
-      fleuriste: '47.76Z', garage: '45.20A',
-      plombier: '43.22A', electricien: '43.21A',
-      coach: '85.51Z', agence: '68.31Z',
-      immobilier: '68.31Z', kiné: '86.90A',
-      ostéo: '86.90A', expert: '69.20Z',
-    };
-
-    let nafCode = null;
-    for (const [key, code] of Object.entries(nafMap)) {
-      if (activite.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').includes(
-          key.normalize('NFD').replace(/[\u0300-\u036f]/g,''))) {
-        nafCode = code;
-        break;
-      }
-    }
-
-    let apiUrl = `https://recherche-entreprises.api.gouv.fr/search?q=${encodeURIComponent(query)}&per_page=25&mtm_campaign=api-entreprise`;
-    if (nafCode) {
-      apiUrl += `&code_naf=${nafCode}`;
-    }
-
+    const apiUrl = `https://recherche-entreprises.api.gouv.fr/search?q=${encodeURIComponent(query)}&per_page=25&include=siege`;
     const apiRes = await fetch(apiUrl, { headers: { 'Accept': 'application/json' } });
     const apiData = await apiRes.json();
     const results = apiData.results || [];
 
-    // Filter by city
-    const villeNorm = ville.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-    const filtered = ville ? results.filter(r => {
-      const siege = r.siege || {};
-      const commune = (siege.libelle_commune || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-      return commune.includes(villeNorm.split(' ')[0]) || villeNorm.includes(commune.split(' ')[0]);
-    }) : results;
-
-    const final = (filtered.length > 0 ? filtered : results).slice(0, 20);
-
-    const places = final.map(r => {
-      const siege = r.siege || {};
-
-      // Build address
-      const adresse = [
-        siege.numero_voie,
-        siege.type_voie,
-        siege.libelle_voie,
-        siege.code_postal,
-        siege.libelle_commune
-      ].filter(Boolean).join(' ');
-
-      // Get best name
+    const places = results.slice(0, 20).map(r => {
       const nom = r.nom_complet
         || r.nom_raison_sociale
-        || (r.prenom_usuel && r.nom ? `${r.prenom_usuel} ${r.nom}` : null)
-        || r.nom
-        || '—';
+        || [r.prenom_usuel, r.nom_usuel].filter(Boolean).join(' ')
+        || [r.prenom_usuel, r.nom].filter(Boolean).join(' ')
+        || '(nom inconnu)';
+
+      const s = r.siege || {};
+      const adresse = [s.numero_voie, s.type_voie, s.libelle_voie, s.code_postal, s.libelle_commune].filter(Boolean).join(' ');
 
       return {
         name: nom,
-        address: adresse || ville,
+        address: adresse || ville || '',
         phone: '',
         website: '',
-        siret: siege.siret || '',
-        siren: r.siren || '',
+        siret: s.siret || '',
         nafLabel: r.libelle_activite_principale || '',
         mapsUrl: adresse ? `https://www.google.com/maps/search/${encodeURIComponent(adresse)}` : '',
+        _raw_keys: Object.keys(r).join(','),
       };
     });
 
-    res.status(200).json({ places, total: apiData.total_results || places.length });
+    res.status(200).json({ places, total: apiData.total_results || places.length, _debug: results[0] });
 
   } catch (e) {
     res.status(500).json({ error: e.message });
