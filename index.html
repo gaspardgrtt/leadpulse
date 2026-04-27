@@ -5,28 +5,21 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>LeadPulse — Trouvez vos clients en 30 secondes</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-</head>
-<body>
-
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased}
 .lp{background:#0a0a0f;color:#e8e6ff;font-family:'Inter',system-ui}
-
-.nav{display:flex;align-items:center;justify-content:space-between;padding:16px 28px;border-bottom:1px solid rgba(255,255,255,.07)}
-.nav-logo{display:flex;align-items:center;gap:9px;font-size:15px;font-weight:600;color:#fff;letter-spacing:-.02em}
+.nav{display:flex;align-items:center;justify-content:space-between;padding:16px 28px;border-bottom:1px solid rgba(255,255,255,.07);position:sticky;top:0;z-index:100;background:#0a0a0f}
+.nav-logo{display:flex;align-items:center;gap:9px;font-size:15px;font-weight:600;color:#fff;letter-spacing:-.02em;cursor:pointer}
 .logo-mark{width:26px;height:26px;border-radius:7px;background:linear-gradient(135deg,#9d8ffa,#6c5ce7);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
 .logo-mark::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.3) 0%,transparent 60%)}
 .logo-mark svg{width:13px;height:13px;fill:none;stroke:white;stroke-width:2;position:relative}
 .nav-links{display:flex;align-items:center;gap:22px}
-.nav-link{font-size:13px;color:rgba(255,255,255,.45);cursor:pointer;transition:color .15s}
+.nav-link{font-size:13px;color:rgba(255,255,255,.45);cursor:pointer;transition:color .15s;text-decoration:none}
 .nav-link:hover{color:rgba(255,255,255,.9)}
 .nav-pill{font-size:11px;padding:3px 10px;border-radius:20px;background:rgba(157,143,250,.15);color:#c4b5fd;border:1px solid rgba(157,143,250,.3)}
 .nav-cta{font-size:13px;padding:7px 16px;border-radius:7px;background:#9d8ffa;color:#0a0a0f;cursor:pointer;font-weight:600;border:none;position:relative;overflow:hidden;transition:all .15s}
 .nav-cta::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.25) 0%,transparent 55%);pointer-events:none}
-.nav-cta::after{content:'';position:absolute;top:0;left:-70%;width:45%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.2),transparent);transform:skewX(-20deg);transition:left .55s;pointer-events:none}
-.nav-cta:hover::after{left:130%}
 .nav-cta:hover{background:#b5a8fc;box-shadow:0 4px 20px rgba(157,143,250,.35)}
-
 .hero{padding:52px 28px 40px;text-align:center}
 .hero-eyebrow{display:inline-flex;align-items:center;gap:7px;padding:4px 12px 4px 8px;border-radius:20px;border:1px solid rgba(157,143,250,.3);background:rgba(157,143,250,.08);margin-bottom:22px}
 .eyebrow-dot{width:5px;height:5px;border-radius:50%;background:#9d8ffa}
@@ -34,7 +27,445 @@
 .hero-h1{font-size:46px;font-weight:700;line-height:1.1;letter-spacing:-.035em;color:#fff;margin-bottom:14px;max-width:560px;margin-left:auto;margin-right:auto}
 .hero-h1 em{font-style:normal;background:linear-gradient(100deg,#c4b5fd,#9d8ffa,#e0d9ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
 .hero-sub{font-size:15px;color:rgba(255,255,255,.48);line-height:1.65;max-width:400px;margin:0 auto 28px}
+.cta-row{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:12px}
+.btn-primary{display:inline-flex;align-items:center;gap:7px;padding:12px 24px;border-radius:9px;background:#9d8ffa;color:#0a0a0f;font-size:14px;font-weight:700;cursor:pointer;border:none;position:relative;overflow:hidden;transition:all .15s;letter-spacing:-.01em}
+.btn-primary::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.28) 0%,transparent 55%);pointer-events:none}
+.btn-primary:hover{background:#b5a8fc;box-shadow:0 6px 28px rgba(157,143,250,.45);transform:translateY(-1px)}
+.btn-primary svg{width:14px;height:14px;stroke:#0a0a0f;fill:none;stroke-width:2.5}
+.btn-ghost{display:inline-flex;align-items:center;gap:7px;padding:11px 20px;border-radius:9px;border:1.5px solid rgba(255,255,255,.22);background:rgba(255,255,255,.07);color:rgba(255,255,255,.85);font-size:14px;cursor:pointer;font-weight:500;transition:all .15s}
+.btn-ghost:hover{border-color:rgba(255,255,255,.4);background:rgba(255,255,255,.12);color:white}
+.btn-ghost svg{width:13px;height:13px;fill:white;stroke:none}
+.hero-note{font-size:11px;color:rgba(255,255,255,.28)}
+.hero-note span{color:rgba(157,143,250,.7)}
+.stats-row{display:flex;align-items:center;margin:32px 28px 0;border:1px solid rgba(255,255,255,.07);border-radius:12px;background:rgba(255,255,255,.025);overflow:hidden}
+.stat-item{flex:1;padding:16px 12px;text-align:center;border-right:1px solid rgba(255,255,255,.06)}
+.stat-item:last-child{border-right:none}
+.stat-num{font-size:22px;font-weight:700;color:#fff;letter-spacing:-.04em;line-height:1;margin-bottom:2px}
+.stat-num span{color:#9d8ffa}
+.stat-label{font-size:10px;color:rgba(255,255,255,.32);font-weight:500;text-transform:uppercase;letter-spacing:.06em}
+.video-section{padding:40px 28px}
+.video-wrap{border-radius:14px;border:1px solid rgba(255,255,255,.08);background:#0f0f1a;overflow:hidden;position:relative}
+.video-bar{padding:10px 14px;border-top:1px solid rgba(255,255,255,.06);display:flex;align-items:center;gap:10px}
+.vb-dot{width:7px;height:7px;border-radius:50%;background:#9d8ffa;animation:pulse 2s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:.4;transform:scale(.8)}50%{opacity:1;transform:scale(1)}}
+@keyframes cur-blink{0%,100%{opacity:1}50%{opacity:0}}
+@keyframes ai-dot{0%,80%,100%{transform:scale(.5);opacity:.3}40%{transform:scale(1);opacity:1}}
+.demo-tag{font-size:10px;padding:4px 12px;border-radius:20px;border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.38);cursor:pointer;transition:all .2s;white-space:nowrap}
+.demo-tag:hover{border-color:rgba(157,143,250,.4);color:#c4b5fd;background:rgba(157,143,250,.08)}
+.demo-tag.active-tag{border-color:rgba(157,143,250,.45);color:#c4b5fd;background:rgba(157,143,250,.12)}
+.vb-text{font-size:11px;color:rgba(255,255,255,.35)}
+.compare-section{padding:0 28px 44px}
+.section-label{font-size:10px;font-weight:700;color:#9d8ffa;text-transform:uppercase;letter-spacing:.1em;margin-bottom:10px}
+.section-title{font-size:28px;font-weight:700;color:#fff;letter-spacing:-.025em;line-height:1.2;margin-bottom:24px}
+.compare-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.compare-card{border-radius:12px;padding:18px;border:1px solid rgba(255,255,255,.07);background:rgba(255,255,255,.02)}
+.compare-card.after{border-color:rgba(157,143,250,.3);background:rgba(157,143,250,.05)}
+.compare-head{display:flex;align-items:center;gap:8px;margin-bottom:14px}
+.compare-dot{width:8px;height:8px;border-radius:50%}
+.compare-title{font-size:13px;font-weight:600;color:rgba(255,255,255,.5)}
+.compare-card.after .compare-title{color:#c4b5fd}
+.compare-items{display:flex;flex-direction:column;gap:8px}
+.ci{display:flex;align-items:flex-start;gap:8px;font-size:12px;line-height:1.5}
+.ci-icon{width:16px;height:16px;flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center}
+.ci-text-bad{color:rgba(255,255,255,.35)}
+.ci-text-good{color:rgba(255,255,255,.7)}
+.how-section{padding:0 28px 44px}
+.how-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.how-card{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:16px;position:relative;overflow:hidden}
+.how-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;border-radius:2px 2px 0 0}
+.hc1::before{background:linear-gradient(90deg,#9d8ffa,transparent)}
+.hc2::before{background:linear-gradient(90deg,#1d9e75,transparent)}
+.hc3::before{background:linear-gradient(90deg,#d4537e,transparent)}
+.how-num{font-size:10px;font-weight:700;color:rgba(255,255,255,.18);margin-bottom:10px;letter-spacing:.05em}
+.how-title{font-size:13px;font-weight:600;color:#fff;margin-bottom:5px;letter-spacing:-.01em}
+.how-desc{font-size:11px;color:rgba(255,255,255,.38);line-height:1.6}
+.app-section{padding:0 28px 44px}
+.app-preview{border-radius:12px;border:1px solid rgba(255,255,255,.08);background:#0f0f1a;overflow:hidden}
+.app-bar{display:flex;align-items:center;gap:6px;padding:10px 14px;border-bottom:1px solid rgba(255,255,255,.06);background:#0a0a14}
+.app-dot{width:8px;height:8px;border-radius:50%}
+.app-url{flex:1;text-align:center;font-size:10px;color:rgba(255,255,255,.2);background:rgba(255,255,255,.04);padding:3px 10px;border-radius:4px;margin:0 12px}
+.app-inner{display:grid;grid-template-columns:190px 1fr}
+.app-sidebar{border-right:1px solid rgba(255,255,255,.06);padding:12px}
+.app-sidebar-head{font-size:9px;font-weight:700;color:rgba(255,255,255,.22);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px}
+.app-search{width:100%;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.09);border-radius:7px;padding:7px 10px;color:rgba(255,255,255,.65);font-size:11px;margin-bottom:10px}
+.filter-label-s{font-size:9px;color:rgba(255,255,255,.3);margin-bottom:3px}
+.filter-sel{width:100%;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:5px;padding:5px 9px;color:rgba(255,255,255,.55);font-size:10px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center}
+.niche-tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
+.ntag{font-size:9px;padding:3px 7px;border-radius:20px;border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.38);cursor:pointer}
+.ntag.a{background:rgba(157,143,250,.2);border-color:rgba(157,143,250,.4);color:#c4b5fd}
+.app-main{padding:12px;display:flex;flex-direction:column;gap:8px}
+.app-topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:2px}
+.res-count{font-size:10px;color:rgba(255,255,255,.3)}
+.res-count strong{color:rgba(255,255,255,.7);font-weight:500}
+.exp-btn{font-size:9px;padding:3px 8px;border-radius:5px;border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.35);background:transparent;cursor:pointer}
+.lead-row{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:8px;padding:10px 12px;cursor:pointer;position:relative;overflow:hidden}
+.lead-row.hi{border-color:rgba(157,143,250,.4);background:rgba(157,143,250,.06)}
+.lead-r-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:4px}
+.lead-r-name{font-size:11px;font-weight:600;color:#fff}
+.lead-r-badge{font-size:8px;padding:2px 6px;border-radius:20px;background:rgba(157,143,250,.2);color:#c4b5fd;border:1px solid rgba(157,143,250,.3)}
+.sp-row{display:flex;align-items:center;gap:4px}
+.sp-num{font-size:9px;color:#c4b5fd;font-weight:600}
+.sp-bar{width:32px;height:2px;border-radius:1px;background:rgba(255,255,255,.1)}
+.sp-fill{height:100%;border-radius:1px;background:#9d8ffa}
+.lead-r-meta{display:flex;gap:8px;font-size:9px;color:rgba(255,255,255,.32);margin-bottom:4px}
+.lead-r-links{display:flex;gap:4px;flex-wrap:wrap}
+.lchip{font-size:8px;padding:2px 6px;border-radius:20px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);color:rgba(255,255,255,.38)}
+.lchip.em{color:#5dcaa5;border-color:rgba(29,158,117,.25);background:rgba(29,158,117,.07)}
+.lchip.ph{color:#f0997b;border-color:rgba(216,90,48,.2);background:rgba(216,90,48,.06)}
+.gen-msg-btn{font-size:8px;padding:3px 8px;border-radius:5px;background:#9d8ffa;border:none;color:#0a0a0f;cursor:pointer;margin-top:5px;font-weight:700}
+.pricing-section{padding:0 28px 44px}
+.pricing-toggle{display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:24px}
+.toggle-label{font-size:12px;color:rgba(255,255,255,.35)}
+.toggle-label.a{color:rgba(255,255,255,.8)}
+.toggle-track{width:36px;height:20px;border-radius:10px;background:rgba(157,143,250,.25);border:1px solid rgba(157,143,250,.35);position:relative;cursor:pointer;transition:background .2s}
+.toggle-track.on{background:#9d8ffa}
+.toggle-thumb{width:14px;height:14px;border-radius:50%;background:white;position:absolute;top:2px;left:2px;transition:left .2s}
+.toggle-track.on .toggle-thumb{left:18px}
+.save-tag{font-size:10px;padding:2px 7px;border-radius:20px;background:rgba(29,158,117,.18);color:#5dcaa5;border:1px solid rgba(29,158,117,.28)}
+.pricing-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;max-width:500px;margin:0 auto}
+.price-card{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:20px;position:relative;overflow:hidden}
+.price-card.featured{background:rgba(157,143,250,.07);border-color:rgba(157,143,250,.35)}
+.price-card.featured::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,#9d8ffa,transparent)}
+.price-tag-top{font-size:10px;font-weight:700;color:#9d8ffa;margin-bottom:12px;text-transform:uppercase;letter-spacing:.08em}
+.price-tag-top.free{color:rgba(255,255,255,.28)}
+.price-amount{font-size:32px;font-weight:700;color:#fff;letter-spacing:-.04em;line-height:1;margin-bottom:3px}
+.price-amount sup{font-size:14px;font-weight:500;vertical-align:top;margin-top:5px;margin-right:1px}
+.price-period{font-size:11px;color:rgba(255,255,255,.28);margin-bottom:16px}
+.price-features{list-style:none;display:flex;flex-direction:column;gap:8px;margin-bottom:18px}
+.price-features li{display:flex;align-items:flex-start;gap:7px;font-size:11px;color:rgba(255,255,255,.52);line-height:1.4}
+.pf-check{width:13px;height:13px;flex-shrink:0;margin-top:1px}
+.pf-dim{color:rgba(255,255,255,.18)}
+.price-btn{width:100%;padding:10px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;letter-spacing:-.01em;border:none;transition:all .15s}
+.price-btn.main{background:#9d8ffa;color:#0a0a0f}
+.price-btn.main:hover{background:#b5a8fc;box-shadow:0 4px 20px rgba(157,143,250,.35)}
+.price-btn.out{background:transparent;color:rgba(255,255,255,.55);border:1.5px solid rgba(255,255,255,.15)}
+.price-btn.out:hover{background:rgba(255,255,255,.07);color:white;border-color:rgba(255,255,255,.3)}
+.faq-section{padding:0 28px 44px}
+.faq-list{display:flex;flex-direction:column;gap:0;border:1px solid rgba(255,255,255,.07);border-radius:12px;overflow:hidden}
+.faq-item{border-bottom:1px solid rgba(255,255,255,.06)}
+.faq-item:last-child{border-bottom:none}
+.faq-q{width:100%;text-align:left;padding:14px 16px;background:transparent;border:none;color:rgba(255,255,255,.92);font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:12px;font-family:inherit;font-weight:600;transition:color .15s}
+.faq-q:hover{color:white;background:rgba(255,255,255,.04)}
+.faq-q.open{color:#c4b5fd}
+.faq-chevron{width:16px;height:16px;flex-shrink:0;transition:transform .25s;stroke:currentColor;fill:none;stroke-width:2}
+.faq-q.open .faq-chevron{transform:rotate(180deg)}
+.faq-a{display:none;padding:0 16px 14px;font-size:12px;color:rgba(255,255,255,.72);line-height:1.7}
+.faq-a.open{display:block}
+.ftr{padding:22px 28px;border-top:1px solid rgba(255,255,255,.06);display:flex;align-items:center;justify-content:space-between}
+.ftr-logo{font-size:13px;font-weight:600;color:rgba(255,255,255,.35)}
+.ftr-links{display:flex;gap:16px}
+.ftr-link{font-size:11px;color:rgba(255,255,255,.22);cursor:pointer;transition:color .15s}
+.ftr-link:hover{color:rgba(255,255,255,.6)}
+</style>
 
+<div class="lp">
+  <nav class="nav">
+    <div class="nav-logo" onclick="window.scrollTo({top:0,behavior:'smooth'})">
+      <div class="logo-mark">
+        <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      LeadPulse
+    </div>
+    <div class="nav-links">
+      <a class="nav-link" onclick="document.getElementById('fonctionnement').scrollIntoView({behavior:'smooth'})">Fonctionnement</a>
+      <a class="nav-link" onclick="document.getElementById('tarifs').scrollIntoView({behavior:'smooth'})">Tarifs</a>
+      <a class="nav-link" onclick="document.getElementById('faq').scrollIntoView({behavior:'smooth'})">FAQ</a>
+      <span class="nav-pill">Early access</span>
+    </div>
+    <button class="nav-cta" onclick="window.location='/app.html'">Commencer gratuitement</button>
+  </nav>
+
+  <section class="hero">
+    <div class="hero-eyebrow">
+      <div class="eyebrow-dot"></div>
+      <span class="eyebrow-text">Prospection intelligente · données publiques uniquement</span>
+    </div>
+    <h1 class="hero-h1">Trouvez vos clients.<br><em>En 30 secondes.</em></h1>
+    <p class="hero-sub">Recherchez, qualifiez et contactez des prospects sans perdre des heures sur Google Maps.</p>
+    <div class="cta-row">
+      <button class="btn-primary" onclick="window.location='/app.html'">
+        <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+        Lancer ma première recherche
+      </button>
+      <button class="btn-ghost" onclick="document.getElementById('demo').scrollIntoView({behavior:'smooth'})">
+        <svg viewBox="0 0 24 24" width="13" height="13"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        Voir la démo
+      </button>
+    </div>
+    <p class="hero-note">Gratuit · <span>Aucun engagement</span> · Résultats en 30 secondes</p>
+    <div class="stats-row">
+      <div class="stat-item"><div class="stat-num">2<span>k+</span></div><div class="stat-label">Prospects trouvés</div></div>
+      <div class="stat-item"><div class="stat-num">30<span>+</span></div><div class="stat-label">Secteurs</div></div>
+      <div class="stat-item"><div class="stat-num">x3</div><div class="stat-label">Taux de réponse</div></div>
+      <div class="stat-item"><div class="stat-num">30<span>s</span></div><div class="stat-label">Pour trouver un lead</div></div>
+    </div>
+  </section>
+
+  <section class="video-section" id="demo">
+    <div class="video-wrap" style="cursor:default">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 16px;border-bottom:1px solid rgba(255,255,255,.07);background:#0a0a14">
+        <div style="display:flex;gap:5px">
+          <div style="width:8px;height:8px;border-radius:50%;background:#ff5f56"></div>
+          <div style="width:8px;height:8px;border-radius:50%;background:#ffbd2e"></div>
+          <div style="width:8px;height:8px;border-radius:50%;background:#27c93f"></div>
+        </div>
+        <div style="font-size:10px;color:rgba(255,255,255,.2);background:rgba(255,255,255,.04);padding:3px 14px;border-radius:4px">app.leadpulse.fr</div>
+        <div style="display:flex;gap:4px">
+          <div id="tab1" onclick="demoGoto(1)" style="font-size:9px;padding:3px 10px;border-radius:20px;background:rgba(157,143,250,.2);border:1px solid rgba(157,143,250,.4);color:#c4b5fd;cursor:pointer;transition:all .2s">① Recherche</div>
+          <div id="tab2" onclick="demoGoto(2)" style="font-size:9px;padding:3px 10px;border-radius:20px;background:transparent;border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.3);cursor:pointer;transition:all .2s">② Leads</div>
+          <div id="tab3" onclick="demoGoto(3)" style="font-size:9px;padding:3px 10px;border-radius:20px;background:transparent;border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.3);cursor:pointer;transition:all .2s">③ Message IA</div>
+        </div>
+      </div>
+      <div style="height:280px;position:relative;overflow:hidden;background:linear-gradient(160deg,#0d0d1a 0%,#12102a 100%)">
+        <div id="sc1" style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;padding:28px 24px;transition:opacity .35s,transform .35s">
+          <div style="text-align:center">
+            <div style="font-size:18px;font-weight:700;color:#fff;letter-spacing:-.02em;margin-bottom:6px">Quelle niche cherchez-vous ?</div>
+            <div style="font-size:12px;color:rgba(255,255,255,.35)">Ville + secteur · Les résultats arrivent en 30 secondes</div>
+          </div>
+          <div style="width:100%;max-width:360px">
+            <div style="background:rgba(255,255,255,.06);border:1.5px solid rgba(157,143,250,.5);border-radius:11px;padding:13px 16px;display:flex;align-items:center;gap:10px;box-shadow:0 0 0 4px rgba(157,143,250,.08)">
+              <svg width="15" height="15" fill="none" stroke="rgba(157,143,250,.7)" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+              <span id="typed-text" style="font-size:13px;color:rgba(255,255,255,.85);flex:1"></span>
+              <span id="typed-cursor" style="width:2px;height:15px;background:#9d8ffa;display:inline-block;border-radius:1px;animation:cur-blink .7s step-end infinite"></span>
+            </div>
+            <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:12px;justify-content:center">
+              <span class="demo-tag active-tag">🍽 Restaurants Bordeaux</span>
+              <span class="demo-tag">💪 Coachs sportifs Lyon</span>
+              <span class="demo-tag">⚖️ Avocats Paris</span>
+              <span class="demo-tag">📸 Photographes Nantes</span>
+            </div>
+          </div>
+          <button onclick="demoGoto(2)" style="background:#9d8ffa;border:none;color:#0a0a0f;font-size:13px;font-weight:700;padding:11px 28px;border-radius:9px;cursor:pointer;display:flex;align-items:center;gap:7px">
+            <svg width="13" height="13" fill="none" stroke="#0a0a0f" stroke-width="2.5" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+            Lancer la recherche →
+          </button>
+        </div>
+        <div id="sc2" style="position:absolute;inset:0;display:flex;flex-direction:column;padding:14px 16px;gap:9px;opacity:0;transform:translateX(30px);pointer-events:none;transition:opacity .35s,transform .35s">
+          <div style="display:flex;align-items:center;justify-content:space-between">
+            <div><span style="font-size:12px;font-weight:600;color:#fff" id="lead-count">0 leads</span><span style="font-size:11px;color:rgba(255,255,255,.35)"> · Restaurants · Bordeaux</span></div>
+            <span style="font-size:9px;padding:3px 10px;border-radius:5px;border:1px solid rgba(255,255,255,.12);color:rgba(255,255,255,.4)">↓ CSV</span>
+          </div>
+          <div id="lead-a" style="background:rgba(157,143,250,.07);border:1px solid rgba(157,143,250,.4);border-radius:9px;padding:11px 13px;opacity:0;transform:translateY(10px);transition:all .4s">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px">
+              <span style="font-size:12px;font-weight:700;color:#fff">Le Petit Comptoir</span>
+              <div style="display:flex;align-items:center;gap:5px"><span style="font-size:10px;font-weight:700;color:#c4b5fd">95</span><div style="width:36px;height:3px;background:rgba(255,255,255,.1);border-radius:2px"><div style="width:95%;height:100%;background:linear-gradient(90deg,#9d8ffa,#c4b5fd);border-radius:2px"></div></div></div>
+            </div>
+            <div style="font-size:10px;color:rgba(255,255,255,.35);margin-bottom:6px">Bordeaux Centre · <span style="color:#5dcaa5">★ Potentiel élevé</span></div>
+            <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:8px">
+              <span style="font-size:9px;padding:2px 8px;border-radius:20px;background:rgba(29,158,117,.08);border:1px solid rgba(29,158,117,.3);color:#5dcaa5">✉ contact@lepetitcomptoir.fr</span>
+              <span style="font-size:9px;padding:2px 8px;border-radius:20px;background:rgba(216,90,48,.07);border:1px solid rgba(216,90,48,.25);color:#f0997b">📞 05 56 44 xx xx</span>
+            </div>
+            <button onclick="demoGoto(3)" style="font-size:9px;padding:5px 12px;border-radius:6px;background:#9d8ffa;border:none;color:#0a0a0f;font-weight:700;cursor:pointer">✦ Générer un message IA</button>
+          </div>
+          <div id="lead-b" style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:9px;padding:11px 13px;opacity:0;transform:translateY(10px);transition:all .4s .18s">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px">
+              <span style="font-size:12px;font-weight:700;color:#fff">Brasserie Saint-Pierre</span>
+              <div style="display:flex;align-items:center;gap:5px"><span style="font-size:10px;font-weight:700;color:#c4b5fd">88</span><div style="width:36px;height:3px;background:rgba(255,255,255,.1);border-radius:2px"><div style="width:88%;height:100%;background:linear-gradient(90deg,#9d8ffa,#c4b5fd);border-radius:2px"></div></div></div>
+            </div>
+            <div style="font-size:10px;color:rgba(255,255,255,.35);margin-bottom:6px">Bordeaux Chartrons · <span style="color:#5dcaa5">★ Potentiel élevé</span></div>
+            <div style="display:flex;gap:5px;flex-wrap:wrap"><span style="font-size:9px;padding:2px 8px;border-radius:20px;background:rgba(29,158,117,.08);border:1px solid rgba(29,158,117,.3);color:#5dcaa5">✉ info@brasserie-sp.fr</span></div>
+          </div>
+          <div id="lead-c" style="font-size:10px;color:rgba(255,255,255,.25);text-align:center;padding:4px;opacity:0;transition:opacity .4s .36s">+ 10 autres leads disponibles</div>
+        </div>
+        <div id="sc3" style="position:absolute;inset:0;display:flex;flex-direction:column;padding:16px;gap:10px;opacity:0;transform:translateX(30px);pointer-events:none;transition:opacity .35s,transform .35s">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:2px">
+            <div style="width:24px;height:24px;border-radius:7px;background:linear-gradient(135deg,#9d8ffa,#6c5ce7);display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="12" height="12" fill="none" stroke="white" stroke-width="2.2" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg></div>
+            <div><div style="font-size:11px;font-weight:700;color:#c4b5fd">Message IA personnalisé</div><div style="font-size:9px;color:rgba(255,255,255,.3)">Pour : Le Petit Comptoir · Bordeaux</div></div>
+            <div id="ai-thinking" style="margin-left:auto;display:flex;gap:3px;align-items:center">
+              <div style="width:4px;height:4px;border-radius:50%;background:#9d8ffa;animation:ai-dot 1.2s ease-in-out infinite"></div>
+              <div style="width:4px;height:4px;border-radius:50%;background:#9d8ffa;animation:ai-dot 1.2s ease-in-out .2s infinite"></div>
+              <div style="width:4px;height:4px;border-radius:50%;background:#9d8ffa;animation:ai-dot 1.2s ease-in-out .4s infinite"></div>
+            </div>
+          </div>
+          <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.09);border-radius:10px;padding:14px;flex:1;overflow:hidden">
+            <div id="ai-msg" style="font-size:11px;color:rgba(255,255,255,.75);line-height:1.75"></div>
+          </div>
+          <div style="display:flex;gap:8px">
+            <button id="copy-btn" onclick="demoCopy()" style="flex:1;padding:10px;border-radius:8px;background:#9d8ffa;border:none;color:#0a0a0f;font-size:12px;font-weight:700;cursor:pointer">Copier le message</button>
+            <button onclick="demoGoto(1)" style="padding:10px 14px;border-radius:8px;border:1px solid rgba(255,255,255,.15);background:transparent;color:rgba(255,255,255,.5);font-size:11px;cursor:pointer">↺ Rejouer</button>
+          </div>
+        </div>
+      </div>
+      <div class="video-bar"><div class="vb-dot"></div><span class="vb-text">Démo interactive · Clique sur les étapes pour naviguer</span></div>
+    </div>
+  </section>
+
+  <section class="compare-section" id="fonctionnement">
+    <div class="section-label">Avant / Après</div>
+    <div class="section-title">La différence LeadPulse.</div>
+    <div class="compare-grid">
+      <div class="compare-card">
+        <div class="compare-head"><div class="compare-dot" style="background:rgba(239,99,123,.5)"></div><div class="compare-title">Sans LeadPulse</div></div>
+        <div class="compare-items">
+          <div class="ci"><div class="ci-icon"><svg width="12" height="12" fill="none" viewBox="0 0 16 16"><line x1="4" y1="12" x2="12" y2="4" stroke="#ef637b" stroke-width="2" stroke-linecap="round"/><line x1="4" y1="4" x2="12" y2="12" stroke="#ef637b" stroke-width="2" stroke-linecap="round"/></svg></div><span class="ci-text-bad">2–3h par jour sur Google Maps</span></div>
+          <div class="ci"><div class="ci-icon"><svg width="12" height="12" fill="none" viewBox="0 0 16 16"><line x1="4" y1="12" x2="12" y2="4" stroke="#ef637b" stroke-width="2" stroke-linecap="round"/><line x1="4" y1="4" x2="12" y2="12" stroke="#ef637b" stroke-width="2" stroke-linecap="round"/></svg></div><span class="ci-text-bad">Qualification manuelle de chaque fiche</span></div>
+          <div class="ci"><div class="ci-icon"><svg width="12" height="12" fill="none" viewBox="0 0 16 16"><line x1="4" y1="12" x2="12" y2="4" stroke="#ef637b" stroke-width="2" stroke-linecap="round"/><line x1="4" y1="4" x2="12" y2="12" stroke="#ef637b" stroke-width="2" stroke-linecap="round"/></svg></div><span class="ci-text-bad">Messages génériques copiés-collés</span></div>
+          <div class="ci"><div class="ci-icon"><svg width="12" height="12" fill="none" viewBox="0 0 16 16"><line x1="4" y1="12" x2="12" y2="4" stroke="#ef637b" stroke-width="2" stroke-linecap="round"/><line x1="4" y1="4" x2="12" y2="12" stroke="#ef637b" stroke-width="2" stroke-linecap="round"/></svg></div><span class="ci-text-bad">2% de taux de réponse</span></div>
+        </div>
+      </div>
+      <div class="compare-card after">
+        <div class="compare-head"><div class="compare-dot" style="background:#9d8ffa"></div><div class="compare-title">Avec LeadPulse</div></div>
+        <div class="compare-items">
+          <div class="ci"><div class="ci-icon"><svg width="12" height="12" fill="none" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6" stroke="#9d8ffa" stroke-width="1.5"/><polyline points="5,8 7,10 11,6" stroke="#9d8ffa" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="ci-text-good">30 secondes pour 20 leads qualifiés</span></div>
+          <div class="ci"><div class="ci-icon"><svg width="12" height="12" fill="none" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6" stroke="#9d8ffa" stroke-width="1.5"/><polyline points="5,8 7,10 11,6" stroke="#9d8ffa" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="ci-text-good">Score de pertinence automatique</span></div>
+          <div class="ci"><div class="ci-icon"><svg width="12" height="12" fill="none" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6" stroke="#9d8ffa" stroke-width="1.5"/><polyline points="5,8 7,10 11,6" stroke="#9d8ffa" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="ci-text-good">Message IA personnalisé en 1 clic</span></div>
+          <div class="ci"><div class="ci-icon"><svg width="12" height="12" fill="none" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6" stroke="#9d8ffa" stroke-width="1.5"/><polyline points="5,8 7,10 11,6" stroke="#9d8ffa" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="ci-text-good">Taux de réponse multiplié par 3</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="how-section">
+    <div class="section-label">Fonctionnement</div>
+    <div class="section-title" style="margin-bottom:16px">3 étapes, c'est tout.</div>
+    <div class="how-grid">
+      <div class="how-card hc1"><div class="how-num">01</div><div class="how-title">Ciblez votre niche</div><div class="how-desc">Ville + secteur. On parcourt les données publiques et on livre une liste scorée.</div></div>
+      <div class="how-card hc2"><div class="how-num">02</div><div class="how-title">Fiche prospect complète</div><div class="how-desc">Email, téléphone, site, réseaux. Tout ce qu'il faut pour contacter directement.</div></div>
+      <div class="how-card hc3"><div class="how-num">03</div><div class="how-title">Message IA personnalisé</div><div class="how-desc">L'IA adapte le message au type de business. Copiez, envoyez, closez.</div></div>
+    </div>
+  </section>
+
+  <section class="app-section">
+    <div class="section-label">Aperçu</div>
+    <div class="section-title" style="margin-bottom:16px">L'interface en action.</div>
+    <div class="app-preview">
+      <div class="app-bar">
+        <div class="app-dot" style="background:#ff5f56"></div>
+        <div class="app-dot" style="background:#ffbd2e"></div>
+        <div class="app-dot" style="background:#27c93f"></div>
+        <div class="app-url">app.leadpulse.fr</div>
+      </div>
+      <div class="app-inner">
+        <div class="app-sidebar">
+          <div class="app-sidebar-head">Recherche</div>
+          <div class="app-search">coachs sportifs Bordeaux</div>
+          <div class="filter-label-s">Ville</div>
+          <div class="filter-sel"><span>Bordeaux</span><svg width="9" height="9" fill="none" stroke="rgba(255,255,255,.3)" stroke-width="2" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></div>
+          <div class="filter-label-s">Secteur</div>
+          <div class="filter-sel"><span>Sport & Coaching</span><svg width="9" height="9" fill="none" stroke="rgba(255,255,255,.3)" stroke-width="2" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></div>
+          <div class="niche-tags"><span class="ntag a">Coachs</span><span class="ntag">Nutri.</span><span class="ntag">Agences</span><span class="ntag">Avocats</span></div>
+        </div>
+        <div class="app-main">
+          <div class="app-topbar"><span class="res-count"><strong>8 leads</strong> · Bordeaux</span><button class="exp-btn">CSV</button></div>
+          <div class="lead-row hi">
+            <div class="lead-r-top"><div><div class="lead-r-name">Bordeaux Fit Studio</div><span class="lead-r-badge">Coach</span></div><div class="sp-row"><span class="sp-num">92</span><div class="sp-bar"><div class="sp-fill" style="width:92%"></div></div></div></div>
+            <div class="lead-r-meta"><span>Bordeaux</span><span style="color:#5dcaa5">Potentiel élevé</span></div>
+            <div class="lead-r-links"><span class="lchip">bordeauxfitstudio.fr</span><span class="lchip em">contact@...</span><span class="lchip ph">05 56...</span></div>
+            <button class="gen-msg-btn">✦ Générer message</button>
+          </div>
+          <div class="lead-row">
+            <div class="lead-r-top"><div><div class="lead-r-name">Aurélie Martin Coaching</div><span class="lead-r-badge">Coach</span></div><div class="sp-row"><span class="sp-num">87</span><div class="sp-bar"><div class="sp-fill" style="width:87%"></div></div></div></div>
+            <div class="lead-r-meta"><span>Bordeaux</span><span style="color:#5dcaa5">Potentiel élevé</span></div>
+            <div class="lead-r-links"><span class="lchip">aureliecoach.fr</span><span class="lchip em">aurelie@...</span></div>
+            <button class="gen-msg-btn">✦ Générer message</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="pricing-section" id="tarifs">
+    <div class="section-label" style="text-align:center">Tarifs</div>
+    <div class="section-title" style="text-align:center;max-width:100%;margin-bottom:8px">Simple et transparent.</div>
+    <div style="text-align:center;font-size:13px;color:rgba(255,255,255,.38);margin-bottom:20px">Un seul client signé couvre 12 mois d'abo.</div>
+    <div class="pricing-toggle">
+      <span class="toggle-label a" id="lbl-m">Mensuel</span>
+      <div class="toggle-track" id="ptoggle" onclick="togglePricing()"><div class="toggle-thumb"></div></div>
+      <span class="toggle-label" id="lbl-a">Annuel</span>
+      <span class="save-tag">-36%</span>
+    </div>
+    <div class="pricing-grid">
+      <div class="price-card">
+        <div class="price-tag-top free">Gratuit</div>
+        <div class="price-amount"><sup>€</sup>0</div>
+        <div class="price-period">Pour toujours</div>
+        <ul class="price-features">
+          <li><svg class="pf-check" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="#9d8ffa" stroke-width="1.2"/><polyline points="5,8 7,10 11,6" stroke="#9d8ffa" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>5 recherches / jour</li>
+          <li><svg class="pf-check" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="#9d8ffa" stroke-width="1.2"/><polyline points="5,8 7,10 11,6" stroke="#9d8ffa" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>10 leads par recherche</li>
+          <li><svg class="pf-check" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="#9d8ffa" stroke-width="1.2"/><polyline points="5,8 7,10 11,6" stroke="#9d8ffa" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>Données de base</li>
+          <li><svg class="pf-check pf-dim" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="rgba(255,255,255,.15)" stroke-width="1.2"/><line x1="6" y1="10" x2="10" y2="6" stroke="rgba(255,255,255,.2)" stroke-width="1.5" stroke-linecap="round"/><line x1="6" y1="6" x2="10" y2="10" stroke="rgba(255,255,255,.2)" stroke-width="1.5" stroke-linecap="round"/></svg><span style="color:rgba(255,255,255,.22)">Email & téléphone</span></li>
+          <li><svg class="pf-check pf-dim" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="rgba(255,255,255,.15)" stroke-width="1.2"/><line x1="6" y1="10" x2="10" y2="6" stroke="rgba(255,255,255,.2)" stroke-width="1.5" stroke-linecap="round"/><line x1="6" y1="6" x2="10" y2="10" stroke="rgba(255,255,255,.2)" stroke-width="1.5" stroke-linecap="round"/></svg><span style="color:rgba(255,255,255,.22)">Messages IA</span></li>
+        </ul>
+        <button class="price-btn out" onclick="window.location='/app.html'">Commencer gratuitement</button>
+      </div>
+      <div class="price-card featured">
+        <div class="price-tag-top">Pro</div>
+        <div class="price-amount" id="price-amount"><sup>€</sup>29</div>
+        <div class="price-period" id="price-period">par mois · sans engagement</div>
+        <ul class="price-features">
+          <li><svg class="pf-check" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="#9d8ffa" stroke-width="1.2"/><polyline points="5,8 7,10 11,6" stroke="#9d8ffa" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>Recherches illimitées</li>
+          <li><svg class="pf-check" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="#9d8ffa" stroke-width="1.2"/><polyline points="5,8 7,10 11,6" stroke="#9d8ffa" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>50 leads par recherche</li>
+          <li><svg class="pf-check" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="#9d8ffa" stroke-width="1.2"/><polyline points="5,8 7,10 11,6" stroke="#9d8ffa" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>Email, tél, réseaux sociaux</li>
+          <li><svg class="pf-check" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="#9d8ffa" stroke-width="1.2"/><polyline points="5,8 7,10 11,6" stroke="#9d8ffa" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>Génération IA de messages</li>
+          <li><svg class="pf-check" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="#9d8ffa" stroke-width="1.2"/><polyline points="5,8 7,10 11,6" stroke="#9d8ffa" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>Export CSV illimité</li>
+        </ul>
+        <button class="price-btn main" onclick="window.location='/app.html'">Démarrer l'essai 7 jours</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="faq-section" id="faq">
+    <div class="section-label">FAQ</div>
+    <div class="section-title" style="margin-bottom:20px">Questions fréquentes.</div>
+    <div class="faq-list" id="faq-list"></div>
+  </section>
+
+  <div class="ftr">
+    <div class="ftr-logo">LeadPulse · 2026</div>
+    <div class="ftr-links">
+      <span class="ftr-link">CGU</span>
+      <span class="ftr-link">Confidentialité</span>
+      <span class="ftr-link">Contact</span>
+    </div>
+  </div>
+</div>
+
+<script>
+const FAQS = [
+  ["Est-ce que c'est légal ?","Oui. LeadPulse n'utilise que des données accessibles publiquement — pages web, fiches entreprises, annuaires professionnels. Nous ne collectons aucune donnée personnelle privée ni sensible."],
+  ["Quelle est la différence entre le plan gratuit et Pro ?","Le plan gratuit donne 5 recherches par jour, 10 leads par recherche, et les données de base. Le plan Pro offre des recherches illimitées, 50 leads par recherche, les coordonnées complètes (email, téléphone) et la génération de messages IA."],
+  ["Y a-t-il une période d'essai ?","Oui, 7 jours d'essai gratuit sur le plan Pro, aucun engagement. Vous testez toutes les fonctionnalités avant de décider."],
+  ["Je ne suis pas tech, est-ce que c'est difficile à prendre en main ?","Pas du tout. L'interface est conçue pour être utilisée sans formation : un champ de recherche, des filtres simples, et des résultats clairs. Vous êtes opérationnel en 2 minutes."],
+];
+const faqList = document.getElementById('faq-list');
+FAQS.forEach((f,i)=>{
+  const item = document.createElement('div');
+  item.className = 'faq-item';
+  item.innerHTML = '<button class="faq-q" onclick="toggleFaq('+i+',this)"><span>'+f[0]+'</span><svg class="faq-chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></button><div class="faq-a" id="fa-'+i+'">'+f[1]+'</div>';
+  faqList.appendChild(item);
+});
+function toggleFaq(i,btn){
+  const a=document.getElementById('fa-'+i);
+  const isOpen=a.classList.contains('open');
+  document.querySelectorAll('.faq-a.open').forEach(el=>el.classList.remove('open'));
+  document.querySelectorAll('.faq-q.open').forEach(el=>el.classList.remove('open'));
+  if(!isOpen){a.classList.add('open');btn.classList.add('open')}
+}
+let isAnnuel=false;
+function togglePricing(){
+  isAnnuel=!isAnnuel;
+  const t=document.getElementById('ptoggle');
+  const pa=document.getElementById('price-amount');
+  const pp=document.getElementById('price-period');
+  if(isAnnuel){t.classList.add('on');pa.innerHTML='<sup>€</sup>19<span style="font-size:13px;font-weight:400;color:rgba(255,255,255,.3)">.90</span>';pp.textContent='par mois · facturé annuellement';document.getElementById('lbl-a').classList.add('a');document.getElementById('lbl-m').classList.remove('a');}
+  else{t.classList.remove('on');pa.innerHTML='<sup>€</sup>29';pp.textContent='par mois · sans engagement';document.getElementById('lbl-m').classList.add('a');document.getElementById('lbl-a').classList.remove('a');}
+}
+const SEARCH_TEXT="Restaurants Bordeaux";
+const AI_MSG="Bonjour,\n\nJ'ai découvert Le Petit Comptoir en cherchant les meilleurs restaurants de Bordeaux et votre établissement m'a vraiment interpellé.\n\nJe travaille avec des restaurateurs bordelais pour les aider à attirer plus de clients locaux grâce à des stratégies digitales simples et efficaces.\n\nSeriez-vous disponible pour un échange de 15 min cette semaine ?\n\nCordialement";
+let demoTimers=[],currentScreen=1;
+function clearDemoTimers(){demoTimers.forEach(clearTimeout);demoTimers=[];}
+function dt(fn,delay){demoTimers.push(setTimeout(fn,delay));}
+function updateTabs(n){[1,2,3].forEach(i=>{const t=document.getElementById('tab'+i);if(i===n){t.style.background='rgba(157,143,250,.2)';t.style.borderColor='rgba(157,143,250,.4)';t.style.color='#c4b5fd';}else{t.style.background='transparent';t.style.borderColor='rgba(255,255,255,.1)';t.style.color='rgba(255,255,255,.3)';}});}
+function showScreen(n){currentScreen=n;updateTabs(n);[1,2,3].forEach(i=>{const s=document.getElementById('sc'+i);if(i!==n){s.style.opacity='0';s.style.transform=i<n?'translateX(-30px)':'translateX(30px)';s.style.pointerEvents='none';}});const sc=document.getElementById('sc'+n);sc.style.pointerEvents='all';setTimeout(()=>{sc.style.opacity='1';sc.style.transform='translateX(0)';},20);}
+function demoGoto(n){clearDemoTimers();showScreen(n);if(n===1)runScreen1();if(n===2)runScreen2();if(n===3)runScreen3();}
+function runScreen1(){const el=document.getElementById('typed-text');el.textContent='';let i=0;function type(){if(i<=SEARCH_TEXT.length){el.textContent=SEARCH_TEXT.slice(0,i);i++;demoTimers.push(setTimeout(type,55+Math.random()*35));}else{dt(()=>demoGoto(2),1200);}}dt(type,500);}
+function runScreen2(){const lc=document.getElementById('lead-count');lc.textContent='0 leads';['lead-a','lead-b','lead-c'].forEach(id=>{const el=document.getElementById(id);el.style.opacity='0';el.style.transform='translateY(10px)';});let count=0;function tick(){count=Math.min(count+1,12);lc.textContent=count+' leads';if(count<12)dt(tick,60);}dt(tick,300);dt(()=>{const e=document.getElementById('lead-a');e.style.opacity='1';e.style.transform='translateY(0)';},600);dt(()=>{const e=document.getElementById('lead-b');e.style.opacity='1';e.style.transform='translateY(0)';},900);dt(()=>{const e=document.getElementById('lead-c');e.style.opacity='1';},1200);dt(()=>demoGoto(3),3500);}
+function runScreen3(){const el=document.getElementById('ai-msg');const thinking=document.getElementById('ai-thinking');el.innerHTML='';thinking.style.display='flex';let i=0;function typeMsg(){if(i<=AI_MSG.length){el.innerHTML=AI_MSG.slice(0,i).replace(/\n/g,'<br>');i+=2;demoTimers.push(setTimeout(typeMsg,16));}else{thinking.style.display='none';dt(()=>demoGoto(1),5000);}}dt(typeMsg,700);}
+function demoCopy(){const btn=document.getElementById('copy-btn');btn.textContent='✓ Copié !';btn.style.background='#1d9e75';setTimeout(()=>{btn.textContent='Copier le message';btn.style.background='#9d8ffa';},1800);}
+window.addEventListener('load',()=>{showScreen(1);runScreen1();});
+</script>
+</body>
+</html>
 .cta-row{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:12px}
 .btn-primary{display:inline-flex;align-items:center;gap:7px;padding:12px 24px;border-radius:9px;background:#9d8ffa;color:#0a0a0f;font-size:14px;font-weight:700;cursor:pointer;border:none;position:relative;overflow:hidden;transition:all .15s;letter-spacing:-.01em}
 .btn-primary::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.28) 0%,transparent 55%);pointer-events:none}
