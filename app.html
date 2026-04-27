@@ -19,9 +19,11 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min
 nav{display:flex;align-items:center;justify-content:space-between;padding:14px 32px;border-bottom:1px solid var(--border);background:rgba(8,8,16,.95);backdrop-filter:blur(12px);position:sticky;top:0;z-index:100}
 .logo{font-family:'Syne',sans-serif;font-weight:800;font-size:17px;color:#fff;display:flex;align-items:center;gap:8px;text-decoration:none}
 .logo-dot{width:8px;height:8px;border-radius:50%;background:var(--purple);box-shadow:0 0 10px var(--purple)}
+.nav-center{position:absolute;left:50%;transform:translateX(-50%)}
+.nav-home-btn{display:inline-flex;align-items:center;gap:7px;font-size:13px;font-weight:600;color:#fff;text-decoration:none;padding:8px 18px;border-radius:20px;background:rgba(120,100,255,.15);border:1px solid rgba(120,100,255,.35);color:var(--purple-light);transition:all .15s;font-family:'DM Sans',sans-serif}
+.nav-home-btn:hover{background:rgba(120,100,255,.25);border-color:rgba(120,100,255,.6);color:#fff;box-shadow:0 0 12px rgba(120,100,255,.2)}
+.nav-home-btn svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2}
 .nav-right{display:flex;align-items:center;gap:16px}
-.nav-link{font-size:12px;color:var(--muted);cursor:pointer;text-decoration:none;transition:color .15s}
-.nav-link:hover{color:#fff}
 .api-badge{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--muted);background:var(--surface);padding:5px 12px;border-radius:20px;border:1px solid var(--border)}
 .status-dot{width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green)}
 
@@ -65,7 +67,6 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:14px 3
 .chip{font-size:10px;padding:3px 9px;border-radius:20px;display:flex;align-items:center;gap:4px;white-space:nowrap;font-weight:500}
 .chip-siret{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);color:rgba(255,255,255,.4)}
 .chip-naf{background:rgba(120,100,255,.08);border:1px solid rgba(120,100,255,.2);color:var(--purple-light)}
-.chip-none{background:transparent;border:1px solid rgba(255,255,255,.05);color:rgba(255,255,255,.18);font-style:italic}
 .lead-right{display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0}
 .maps-btn{font-size:10px;color:rgba(120,100,255,.6);text-decoration:none;display:flex;align-items:center;gap:4px;transition:color .15s;white-space:nowrap}
 .maps-btn:hover{color:var(--purple-light)}
@@ -86,12 +87,19 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:14px 3
 <body>
 
 <nav>
-  <a class="logo" href="/landing.html">
+  <a class="logo" href="/index.html">
     <div class="logo-dot"></div>
     LeadPulse
   </a>
+
+  <div class="nav-center">
+    <a class="nav-home-btn" href="/index.html">
+      <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      Accueil
+    </a>
+  </div>
+
   <div class="nav-right">
-    <a class="nav-link" href="/landing.html">Accueil</a>
     <div class="api-badge">
       <div class="status-dot"></div>
       API connectée
