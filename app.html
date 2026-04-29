@@ -620,10 +620,11 @@ function renderResults(leads, query) {
       : '<span class="chip chip-noweb">⚠ Pas de site</span>';
     const sizeChip = l.effectif ? '<span class="chip chip-size">👥 '+escHtml(l.effectif)+' sal.</span>' : '';
     const nafChip  = l.nafLabel ? '<span class="chip chip-naf">'+escHtml(l.nafLabel.length>30?l.nafLabel.slice(0,30)+'…':l.nafLabel)+'</span>' : '';
-    const mapsBtn  = l.mapsUrl  ? '<a class="maps-link" href="'+escHtml(l.mapsUrl)+'" target="_blank"><svg width="10" height="10" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>Maps</a>' : '';
+    const mapsBtn  = l.mapsUrl  ? '<a class="maps-link" href="'+escHtml(l.mapsUrl)+'" target="_blank" onclick="event.stopPropagation()"><svg width="10" height="10" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>Maps</a>' : '';
+    const phoneSnip = l.phone ? '<span style="font-size:11px;color:var(--muted);display:flex;align-items:center;gap:4px"><svg width="10" height="10" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.09 4.18 2 2 0 015.09 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L9.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>'+escHtml(l.phone)+'</span>' : '';
 
-    html += '<div class="lead-card" id="card-'+i+'">'
-      + '<div class="card-head" onclick="toggleCard('+i+')">'
+    html += '<div class="lead-card" id="card-'+i+'" onclick="openLead('+i+')" style="cursor:pointer">'
+      + '<div class="card-head">'
       + '<div class="card-left">'
       + '<div class="card-name">'+escHtml(l.name)+'</div>'
       + (l.address ? '<div class="card-address"><svg width="10" height="10" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>'+escHtml(l.address)+'</div>' : '')
@@ -632,29 +633,8 @@ function renderResults(leads, query) {
       + '<div class="card-right">'
       + '<div class="score-badge '+sc+'" title="Score de présence en ligne">'+l.presenceScore+'/10 '+scLabel+'</div>'
       + mapsBtn
-      + '<button class="btn-expand" id="expand-btn-'+i+'" onclick="event.stopPropagation();toggleCard('+i+')">✦ Ouvrir la fiche</button>'
+      + '<button class="btn-expand" onclick="event.stopPropagation();openLead('+i+')">✦ Ouvrir la fiche</button>'
       + '</div>'
-      + '</div>'
-      // Detail panel
-      + '<div class="detail-panel" id="panel-'+i+'">'
-      + '<div class="detail-tabs">'
-      + '<button class="dtab active" id="dtab-info-'+i+'" onclick="switchTab('+i+',\'info\')">📋 Fiche</button>'
-      + '<button class="dtab" id="dtab-score-'+i+'" onclick="switchTab('+i+',\'score\')">📊 Score web</button>'
-      + '<button class="dtab" id="dtab-email-'+i+'" onclick="switchTab('+i+',\'email\')">✉ Email IA</button>'
-      + '<button class="dtab" id="dtab-call-'+i+'" onclick="switchTab('+i+',\'call\')">📞 Cold call</button>'
-      + '</div>'
-      // TAB INFO
-      + '<div class="tab-content active" id="tc-info-'+i+'">'
-      + buildInfoTab(l, i)
-      + '</div>'
-      // TAB SCORE
-      + '<div class="tab-content" id="tc-score-'+i+'">'
-      + buildScoreTab(l, i)
-      + '</div>'
-      // TAB EMAIL
-      + '<div class="tab-content" id="tc-email-'+i+'"><div class="ai-loading"><div class="ai-dots"><div class="ai-dot"></div><div class="ai-dot"></div><div class="ai-dot"></div></div>Clique sur l\'onglet pour générer…</div></div>'
-      // TAB CALL
-      + '<div class="tab-content" id="tc-call-'+i+'"><div class="ai-loading"><div class="ai-dots"><div class="ai-dot"></div><div class="ai-dot"></div><div class="ai-dot"></div></div>Clique sur l\'onglet pour générer…</div></div>'
       + '</div>'
       + '</div>';
   });
@@ -739,6 +719,13 @@ function buildScoreTab(l, i) {
 
 function scoreClass(s) { return s >= 7 ? 'good' : s >= 4 ? 'mid' : 'bad'; }
 function scoreLabel(s) { return s >= 7 ? '🟢' : s >= 4 ? '🟡' : '🔴'; }
+
+function openLead(i) {
+  const l = currentLeads[i];
+  if (!l) return;
+  localStorage.setItem('lp_current_lead', JSON.stringify(l));
+  window.location.href = 'lead.html';
+}
 
 // ─────────────────────────────────────
 //  TOGGLE CARD / TABS
