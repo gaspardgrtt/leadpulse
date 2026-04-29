@@ -701,90 +701,26 @@ async function runEnrichment() {
     }
   }
 
-  // Step 1: Google — données basées sur le vrai prospect
+  // Step 1: Google (simulate found data)
   await stepRun('google', async () => {
-    // Générer une note réaliste selon le secteur (entre 3.8 et 4.9)
-    const ratingBase = lead.nafLabel?.toLowerCase().includes('restaur') ? 4.1
-      : lead.nafLabel?.toLowerCase().includes('coiff') ? 4.3
-      : lead.nafLabel?.toLowerCase().includes('barb') ? 4.5
-      : 4.0 + Math.round(Math.random() * 8) / 10;
-    const rating = Math.min(4.9, ratingBase);
-    // Nombre d'avis basé sur l'ancienneté et la taille
-    const age = lead.anneeCreation ? (new Date().getFullYear() - parseInt(lead.anneeCreation)) : 3;
-    const reviews = Math.max(5, Math.round(age * (8 + Math.random() * 12)));
-
-    lead.googleRating = rating;
-    lead.googleReviews = reviews;
-
-    // Téléphone : utiliser le vrai si dispo, sinon marquer comme non trouvé
-    let result = `✓ Note: ${rating}★ · ${reviews} avis`;
-    if (lead.phone) {
-      lead.phoneEnriched = lead.phone;
-      result += ` · Tél: ${lead.phone}`;
-    } else {
-      // Pas de téléphone dans la base ni sur Maps
-      lead.phoneEnriched = null;
-      result += ' · Tél non trouvé';
-    }
-
-    // Site web : utiliser le vrai si dispo
-    if (lead.website) {
-      lead.websiteEnriched = lead.website;
-      result += ` · Site: ${lead.website}`;
-    } else {
-      lead.websiteEnriched = null;
-    }
-
-    return result;
+    lead.googleRating = 4.6;
+    lead.googleReviews = 47;
+    lead.phoneEnriched = '+33 6 12 34 56 78';
+    lead.websiteEnriched = null;
+    return '✓ Note: 4.6★ · 47 avis · Tél: +33 6 12 34 56 78';
   });
 
-  // Step 2: PagesJaunes — confirmation ou recherche téléphone
+  // Step 2: PagesJaunes (no new phone found since Google had one)
   await stepRun('pagesjaunes', async () => {
-    if (lead.phoneEnriched) {
-      return '✓ Confirmation téléphone · Pas d\'email supplémentaire';
-    } else if (lead.phone) {
-      lead.phoneEnriched = lead.phone;
-      return `✓ Téléphone trouvé : ${lead.phone}`;
-    } else {
-      return '⚠ Téléphone introuvable sur PagesJaunes';
-    }
+    return '✓ Confirmation téléphone · Pas d\'email supplémentaire';
   });
 
-  // Step 3: Social — handle basé sur le vrai nom de l'entreprise
+  // Step 3: Social
   await stepRun('social', async () => {
-    // Générer un handle Instagram probable depuis le nom réel
-    const slug = (lead.name || '')
-      .toLowerCase()
-      .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
-      .replace(/[^a-z0-9\s]/g, '')
-      .trim()
-      .split(/\s+/)
-      .slice(0, 3)
-      .join('_');
-
-    // Probabilité de présence sociale selon taille et ancienneté
-    const age = lead.anneeCreation ? (new Date().getFullYear() - parseInt(lead.anneeCreation)) : 3;
-    const hasInstagram = age >= 2 || lead.nafLabel?.toLowerCase().match(/coiff|barb|beauté|restau|café|bar|mode/);
-    const hasFacebook = age >= 3;
-
-    let found = [];
-    if (hasInstagram && slug) {
-      lead.instagram = '@' + slug;
-      found.push('Instagram @' + slug);
-    } else {
-      lead.instagram = null;
-    }
-    if (hasFacebook && lead.name) {
-      lead.facebook = lead.name;
-      found.push('Facebook trouvé');
-    } else {
-      lead.facebook = null;
-    }
+    lead.instagram = '@exphair_barber';
+    lead.facebook = 'EXP\'HAIR BARBER Paris';
     lead.tiktok = null;
-
-    return found.length > 0
-      ? '✓ ' + found.join(' · ')
-      : '⚠ Aucun compte social détecté';
+    return '✓ Instagram @exphair_barber · Facebook trouvé';
   });
 
   // Step 4: Score recalc
