@@ -492,6 +492,76 @@ function quickPresenceScore(lead) {
 }
 
 // ─────────────────────────────────────
+//  GEO PARSER — extrait ville + secteur
+// ─────────────────────────────────────
+// Dictionnaire des grandes villes françaises → code département
+const VILLE_DEP = {
+  'paris':75,'marseille':13,'lyon':69,'toulouse':31,'nice':6,'nantes':44,
+  'montpellier':34,'strasbourg':67,'bordeaux':33,'lille':59,'rennes':35,
+  'reims':51,'le havre':76,'saint-etienne':42,'toulon':83,'grenoble':38,
+  'dijon':21,'angers':49,'nimes':30,'villeurbanne':69,'clermont-ferrand':63,
+  'le mans':72,'aix-en-provence':13,'brest':29,'tours':37,'amiens':80,
+  'limoges':87,'annecy':74,'perpignan':66,'metz':57,'boulogne-billancourt':92,
+  'orleans':45,'mulhouse':68,'rouen':76,'caen':14,'nancy':54,'argenteuil':95,
+  'saint-denis':93,'roubaix':59,'tourcoing':59,'montreuil':93,'avignon':84,
+  'asnieres-sur-seine':92,'versailles':78,'poitiers':86,'pau':64,'courbevoie':92,
+  'la rochelle':17,'calais':62,'saint-nazaire':44,'cannes':6,'colmar':68,
+  'dunkerque':59,'lorient':56,'beziers':34,'quimper':29,'la seyne-sur-mer':83,
+  'valence':26,'vitry-sur-seine':94,'creteil':94,'aulnay-sous-bois':93,
+  'saint-maur-des-fosses':94,'rueil-malmaison':92,'antibes':6,'rochelle':17
+};
+
+function parseQuery(raw) {
+  const q = raw.trim().toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+
+  // Essaye de trouver une ville connue dans la requête
+  let detectedVille = null;
+  let detectedDep = null;
+
+  // Trier par longueur décroissante pour matcher "la rochelle" avant "rochelle"
+  const sorted = Object.keys(VILLE_DEP).sort((a,b) => b.length - a.length);
+  for (const ville of sorted) {
+    const villeNorm = ville.normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+    if (q.includes(villeNorm)) {
+      detectedVille = ville;
+      detectedDep = VILLE_DEP[ville];
+      break;
+    }
+  }
+
+  return { detectedVille, detectedDep };
+}
+
+// ─────────────────────────────────────
+//  RÉSOLUTION NOM COMMERCIAL
+// ─────────────────────────────────────
+function resolveNom(r) {
+  const s = r.siege || {};
+  // Priorité : nom_commercial (enseigne), puis raison sociale, puis nom complet
+  // On évite les noms de personne physique isolés si on a une raison sociale
+  const commercial = s.nom_commercial || r.nom_commercial || '';
+  const raisonSociale = r.nom_raison_sociale || s.nom_raison_sociale || '';
+  const nomComplet = r.nom_complet || '';
+
+  // Si on a un nom commercial (enseigne), on le préfère toujours
+  if (commercial && commercial.trim().length > 1) return commercial.trim();
+
+  // Raison sociale disponible et non vide
+  if (raisonSociale && raisonSociale.trim().length > 1) return raisonSociale.trim();
+
+  // nom_complet fallback
+  if (nomComplet && nomComplet.trim().length > 1) return nomComplet.trim();
+
+  // Nom de personne physique en dernier recours
+  const prenom = r.prenom_usuel || r.prenom_1 || '';
+  const nom = r.nom_usuel || r.nom || '';
+  if (prenom || nom) return (prenom + ' ' + nom).trim();
+
+  return 'Entreprise inconnue';
+}
+
+// ─────────────────────────────────────
 //  SEARCH — MULTI-SOURCE
 // ─────────────────────────────────────
 async function doSearch() {
@@ -510,62 +580,60 @@ async function doSearch() {
   currentLeads = [];
   expandedCards = {};
   try {
-    // Source 1: Recherche Entreprises (api.gouv.fr) — fiable, officielle
-    const url1 = 'https://recherche-entreprises.api.gouv.fr/search?q=' + encodeURIComponent(q) + '&per_page=20&minimal=false';
+    // ── Parsing géographique ───────────────────────────────────────────────
+    const { detectedVille, detectedDep } = parseQuery(q);
+
+    // Construire l'URL avec filtre département si détecté
+    let url1 = 'https://recherche-entreprises.api.gouv.fr/search?q=' + encodeURIComponent(q) + '&per_page=25&minimal=false';
+    if (detectedDep) {
+      url1 += '&departement=' + detectedDep;
+    }
+
     const r1 = await fetch(url1);
     if (!r1.ok) throw new Error('API entreprises indisponible (status '+r1.status+')');
     const d1 = await r1.json();
-    const results1 = d1.results || [];
+    let results1 = d1.results || [];
 
-    // Source 2: Annuaire des Entreprises — données complémentaires
-    // On récupère les SIREN pour enrichir
-    const sirenList = results1.map(r => r.siren).filter(Boolean).slice(0, 10);
-
-    // Enrichissement parallèle via annuaire (si disponible)
-    const enrichMap = {};
-    if (sirenList.length > 0) {
-      await Promise.allSettled(sirenList.map(async (siren) => {
-        try {
-          const r2 = await fetch('https://annuaire-entreprises.data.gouv.fr/api/v3/etablissement/'+siren+'000'+Math.floor(Math.random()*9999).toString().padStart(4,'0'), {signal: AbortSignal.timeout(3000)});
-          // Tentative silencieuse — on ignore les erreurs d'enrichissement
-        } catch(e) {}
-      }));
+    // ── Post-filtre géographique côté client ───────────────────────────────
+    // Si une ville est détectée, on ne garde que les établissements dans la bonne commune/dept
+    if (detectedVille && results1.length > 0) {
+      const villeNorm = detectedVille.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
+      const filtered = results1.filter(r => {
+        const s = r.siege || {};
+        const commune = (s.libelle_commune || '').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
+        const cp = (s.code_postal || '').substring(0,2);
+        const depStr = detectedDep ? String(detectedDep).padStart(2,'0') : '';
+        // Matcher sur la commune OU le département
+        return commune.includes(villeNorm.split(' ').pop()) || (depStr && cp === depStr);
+      });
+      // N'utiliser le filtre que si on a des résultats — sinon garder les résultats bruts
+      if (filtered.length > 0) results1 = filtered;
     }
 
     // Mapper les résultats
     currentLeads = results1.map(function(r) {
       const s = r.siege || {};
-      const nom = r.nom_complet || r.nom_raison_sociale || (r.prenom_usuel ? (r.prenom_usuel+' '+(r.nom_usuel||r.nom||'')).trim() : '') || 'Inconnu';
-      const adresse = [s.numero_voie, s.type_voie, s.libelle_voie, s.code_postal, s.libelle_commune].filter(Boolean).join(' ');
+
+      // ── Nom commercial prioritaire ────────────────────────────────────────
+      const nom = resolveNom(r);
+
+      const adresse = [s.numero_voie, s.indice_repetition_etablissement, s.type_voie, s.libelle_voie, s.complement_adresse, s.code_postal, s.libelle_commune].filter(Boolean).join(' ');
       
-      // Téléphone depuis les données disponibles
       const phone = s.telephone || r.telephone || '';
-      
-      // Site web
       const website = s.website || r.website || s.url || r.url || '';
-      
-      // Email
       const email = s.email || r.email || guessEmail(nom, website);
-      
-      // Effectifs
       const effectif = formatEffectif(r.tranche_effectif_salarie || s.tranche_effectif_salarie);
-      
-      // CA — souvent indisponible via API publique, on note "confidentiel" si absent
       const ca = r.chiffre_affaires || null;
-      
-      // Année de création
       const anneeCreation = r.date_creation ? r.date_creation.substring(0,4) : null;
-      
-      // NAF label
       const nafLabel = r.libelle_activite_principale || s.libelle_activite_principale || '';
       const nafCode = r.activite_principale || s.activite_principale || '';
       
       const lead = {
-        name: nom.trim(),
+        name: nom,
         address: adresse,
         phone,
         website,
-        email,
+        email: email || guessEmail(nom, website),
         effectif,
         ca,
         anneeCreation,
@@ -573,12 +641,11 @@ async function doSearch() {
         nafCode,
         siret: s.siret || '',
         siren: r.siren || '',
+        commune: s.libelle_commune || '',
         mapsUrl: adresse ? 'https://www.google.com/maps/search/'+encodeURIComponent(adresse) : '',
         formeJuridique: r.nature_juridique || '',
-        // Score de présence calculé
         presenceScore: 0,
       };
-      lead.email = lead.email || guessEmail(nom, website);
       lead.presenceScore = quickPresenceScore(lead);
       return lead;
     });
@@ -619,9 +686,16 @@ function renderResults(leads, query) {
       ? '<span class="chip chip-web">🌐 Site web</span>'
       : '<span class="chip chip-noweb">⚠ Pas de site</span>';
     const sizeChip = l.effectif ? '<span class="chip chip-size">👥 '+escHtml(l.effectif)+' sal.</span>' : '';
-    const nafChip  = l.nafLabel ? '<span class="chip chip-naf">'+escHtml(l.nafLabel.length>30?l.nafLabel.slice(0,30)+'…':l.nafLabel)+'</span>' : '';
+    // NAF chip tronqué mais lisible
+    const nafShort = l.nafLabel ? l.nafLabel.replace(/\(.*?\)/g,'').trim() : '';
+    const nafChip  = nafShort ? '<span class="chip chip-naf" title="'+escHtml(l.nafLabel)+'">'+escHtml(nafShort.length>28?nafShort.slice(0,28)+'…':nafShort)+'</span>' : '';
     const mapsBtn  = l.mapsUrl  ? '<a class="maps-link" href="'+escHtml(l.mapsUrl)+'" target="_blank" onclick="event.stopPropagation()"><svg width="10" height="10" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>Maps</a>' : '';
     const phoneSnip = l.phone ? '<span style="font-size:11px;color:var(--muted);display:flex;align-items:center;gap:4px"><svg width="10" height="10" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.09 4.18 2 2 0 015.09 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L9.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>'+escHtml(l.phone)+'</span>' : '';
+
+    // Adresse courte (ville + CP) pour l'affichage en card
+    const adresseShort = l.commune
+      ? escHtml(l.commune.charAt(0).toUpperCase() + l.commune.slice(1).toLowerCase())
+      : (l.address ? escHtml(l.address.split(' ').slice(-2).join(' ')) : '');
 
     html += '<div class="lead-card" id="card-'+i+'" onclick="openLead('+i+')" style="cursor:pointer">'
       + '<div class="card-head">'
