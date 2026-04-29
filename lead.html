@@ -1,1 +1,749 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fiche prospect — LeadPulse</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased;cursor:none!important}
+:root{
+  --bg:#07070f;--surface:#0e0e1b;--surface2:#141428;--surface3:#1a1a32;
+  --border:rgba(255,255,255,.07);--border-accent:rgba(100,80,255,.45);
+  --purple:#6c5ce7;--purple-light:#a99ff7;--purple-dim:rgba(108,92,231,.15);
+  --green:#00d68f;--green-dim:rgba(0,214,143,.12);
+  --orange:#ff9f43;--orange-dim:rgba(255,159,67,.12);
+  --red:#ff4757;--red-dim:rgba(255,71,87,.12);
+  --blue:#4fc3f7;--blue-dim:rgba(79,195,247,.12);
+  --text:#e4e2ff;--muted:rgba(255,255,255,.36);--faint:rgba(255,255,255,.12);
+}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;overflow-x:hidden;padding-bottom:60px}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 60% 50% at 20% 20%,rgba(108,92,231,.07) 0%,transparent 60%),radial-gradient(ellipse 40% 40% at 80% 80%,rgba(0,214,143,.04) 0%,transparent 60%);pointer-events:none;z-index:0}
 
+/* CURSOR */
+#cursor{position:fixed;width:10px;height:10px;background:var(--purple);border-radius:50%;pointer-events:none;z-index:9999;transition:transform .1s,width .15s,height .15s;box-shadow:0 0 14px rgba(108,92,231,.8);top:-100px;left:-100px}
+#cursor.clicking{transform:scale(.65)}
+#cursor.hovering{width:22px;height:22px;background:transparent;border:1.5px solid var(--purple)}
+#cursor-trail{position:fixed;width:4px;height:4px;border-radius:50%;background:rgba(108,92,231,.3);pointer-events:none;z-index:9998;top:-100px;left:-100px;transition:left .2s,top .2s}
+
+/* NAV */
+nav.topnav{display:flex;align-items:center;justify-content:space-between;padding:13px 24px;border-bottom:1px solid var(--border);background:rgba(7,7,15,.96);backdrop-filter:blur(16px);position:sticky;top:0;z-index:200}
+.logo{font-family:'Syne',sans-serif;font-weight:800;font-size:17px;color:#fff;display:flex;align-items:center;gap:8px;text-decoration:none;letter-spacing:-.02em}
+.logo-mark{width:26px;height:26px;border-radius:8px;background:linear-gradient(135deg,#6c5ce7,#a99ff7);display:flex;align-items:center;justify-content:center;box-shadow:0 0 16px rgba(108,92,231,.5)}
+.logo-mark svg{width:12px;height:12px;stroke:#fff;fill:none;stroke-width:2.2}
+.btn-back{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--muted);background:var(--surface);border:1px solid var(--border);padding:7px 14px;border-radius:8px;text-decoration:none;transition:all .15s;cursor:pointer}
+.btn-back:hover{color:#fff;border-color:rgba(255,255,255,.2)}
+
+/* LAYOUT */
+.page-wrap{max-width:1100px;margin:0 auto;padding:28px 24px;position:relative;z-index:1}
+
+/* HERO PROSPECT */
+.prospect-hero{display:grid;grid-template-columns:1fr auto;gap:20px;align-items:start;margin-bottom:32px;padding:28px;background:var(--surface);border:1px solid var(--border);border-radius:18px;position:relative;overflow:hidden}
+.prospect-hero::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(108,92,231,.6),transparent)}
+.ph-left{}
+.ph-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var(--purple-light);margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.ph-name{font-family:'Syne',sans-serif;font-size:26px;font-weight:800;color:#fff;letter-spacing:-.03em;line-height:1.1;margin-bottom:10px}
+.ph-address{font-size:13px;color:var(--muted);display:flex;align-items:center;gap:6px;margin-bottom:14px}
+.ph-chips{display:flex;gap:7px;flex-wrap:wrap}
+.chip{font-size:11px;padding:4px 11px;border-radius:20px;display:flex;align-items:center;gap:4px;font-weight:500;border:1px solid transparent}
+.chip-naf{background:var(--purple-dim);border-color:rgba(108,92,231,.25);color:var(--purple-light)}
+.chip-size{background:var(--blue-dim);border-color:rgba(79,195,247,.25);color:var(--blue)}
+.chip-web{background:rgba(255,159,67,.08);border-color:rgba(255,159,67,.2);color:var(--orange)}
+.chip-noweb{background:rgba(255,71,87,.08);border-color:rgba(255,71,87,.2);color:var(--red)}
+.chip-good{background:var(--green-dim);border-color:rgba(0,214,143,.2);color:var(--green)}
+.ph-right{display:flex;flex-direction:column;align-items:flex-end;gap:12px;flex-shrink:0}
+.score-circle{position:relative;width:80px;height:80px}
+.score-circle svg{transform:rotate(-90deg)}
+.score-circle-num{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column}
+.sc-num{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:#fff;line-height:1}
+.sc-sub{font-size:9px;color:var(--muted)}
+.ph-contacts{display:flex;flex-direction:column;gap:6px;align-items:flex-end}
+.contact-item{display:flex;align-items:center;gap:6px;font-size:12px;color:rgba(255,255,255,.7)}
+.contact-item a{color:inherit;text-decoration:none}
+.contact-item a:hover{color:var(--purple-light)}
+.btn-copy-small{background:none;border:none;color:var(--muted);cursor:pointer;padding:2px;transition:color .15s;flex-shrink:0}
+.btn-copy-small:hover{color:var(--purple-light)}
+
+/* MAIN GRID */
+.main-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+@media(max-width:780px){.main-grid{grid-template-columns:1fr}.prospect-hero{grid-template-columns:1fr}.ph-right{align-items:flex-start}}
+
+/* SECTION CARDS */
+.section-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;overflow:hidden}
+.section-card.full-width{grid-column:1/-1}
+.sc-head{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.sc-title{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:#fff;display:flex;align-items:center;gap:8px}
+.sc-body{padding:20px}
+
+/* INFO GRID */
+.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.info-item{background:rgba(255,255,255,.02);border:1px solid var(--border);border-radius:10px;padding:12px}
+.info-label{font-size:10px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px}
+.info-value{font-size:13px;color:#fff;font-weight:500;display:flex;align-items:center;gap:6px}
+.info-value a{color:var(--purple-light);text-decoration:none}
+.info-value a:hover{color:#fff}
+.info-value.na{color:var(--muted);font-weight:400;font-style:italic}
+
+/* EMAIL SECTION */
+.msg-box{font-size:13px;color:rgba(255,255,255,.85);line-height:1.8;white-space:pre-wrap;background:rgba(0,0,0,.22);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:18px;margin-bottom:12px;min-height:80px}
+.ai-actions{display:flex;gap:8px;flex-wrap:wrap}
+.btn-action{font-size:12px;padding:8px 16px;border-radius:8px;border:1px solid;cursor:pointer;font-weight:600;font-family:'DM Sans',sans-serif;transition:all .15s;display:flex;align-items:center;gap:5px}
+.btn-copy{background:var(--green-dim);border-color:rgba(0,214,143,.3);color:var(--green)}
+.btn-copy:hover{background:rgba(0,214,143,.2);color:#fff}
+.btn-regen{background:transparent;border-color:rgba(255,255,255,.1);color:var(--muted)}
+.btn-regen:hover{border-color:rgba(255,255,255,.25);color:#fff}
+.btn-gen{background:var(--purple);border-color:var(--purple);color:#fff;font-family:'Syne',sans-serif}
+.btn-gen:hover{background:#7d6ef5;box-shadow:0 4px 16px rgba(108,92,231,.4)}
+.btn-gen:disabled{opacity:.45;cursor:not-allowed}
+
+/* LOADING */
+.ai-loading{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:12px;padding:16px 0}
+.ai-dots{display:flex;gap:4px}
+.ai-dot{width:5px;height:5px;border-radius:50%;background:var(--purple);animation:ai-pulse 1.2s ease-in-out infinite}
+.ai-dot:nth-child(2){animation-delay:.2s}.ai-dot:nth-child(3){animation-delay:.4s}
+@keyframes ai-pulse{0%,80%,100%{transform:scale(.5);opacity:.3}40%{transform:scale(1);opacity:1}}
+
+/* COLD CALL SCRIPT */
+.call-meta{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.call-meta-chip{font-size:11px;padding:4px 10px;border-radius:6px;background:rgba(255,159,67,.08);border:1px solid rgba(255,159,67,.2);color:var(--orange)}
+.call-steps{display:flex;flex-direction:column;gap:0}
+.call-step{border:1px solid var(--border);border-radius:12px;margin-bottom:10px;overflow:hidden;transition:all .2s}
+.call-step.active-step{border-color:rgba(108,92,231,.4);box-shadow:0 4px 20px rgba(108,92,231,.1)}
+.call-step.done-step{border-color:rgba(0,214,143,.2);opacity:.7}
+.step-head{padding:12px 16px;display:flex;align-items:center;gap:10px;cursor:pointer;user-select:none}
+.step-num{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:11px;font-weight:800;flex-shrink:0}
+.step-num.pending{background:rgba(255,255,255,.06);color:var(--muted)}
+.step-num.active{background:var(--purple);color:#fff;box-shadow:0 0 12px rgba(108,92,231,.5)}
+.step-num.done{background:var(--green-dim);color:var(--green);border:1px solid rgba(0,214,143,.3)}
+.step-title{font-family:'Syne',sans-serif;font-size:12px;font-weight:700;flex:1}
+.step-duration{font-size:10px;color:var(--muted)}
+.step-body{padding:0 16px 14px;display:none}
+.step-body.open{display:block}
+.step-script{font-size:13px;color:rgba(255,255,255,.88);line-height:1.8;background:rgba(0,0,0,.2);border:1px solid rgba(255,255,255,.05);border-radius:8px;padding:14px;margin-bottom:10px;font-style:italic}
+.step-tip{font-size:11px;color:var(--orange);background:rgba(255,159,67,.07);border:1px solid rgba(255,159,67,.15);border-radius:7px;padding:8px 12px;margin-bottom:12px;line-height:1.5}
+
+/* BRANCHES */
+.branches{display:flex;flex-direction:column;gap:8px;margin-top:4px}
+.branch-label{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px}
+.branch-item{border:1px solid var(--border);border-radius:9px;overflow:hidden;transition:border-color .15s}
+.branch-item:hover{border-color:rgba(108,92,231,.3)}
+.branch-trigger{padding:10px 14px;display:flex;align-items:center;gap:8px;cursor:pointer;font-size:12px;font-weight:600;color:rgba(255,255,255,.7);background:rgba(255,255,255,.02);transition:background .15s}
+.branch-trigger:hover{background:rgba(108,92,231,.06);color:#fff}
+.branch-trigger svg{width:14px;height:14px;flex-shrink:0;stroke:var(--muted);transition:stroke .15s}
+.branch-trigger:hover svg{stroke:var(--purple-light)}
+.branch-trigger.expanded svg{transform:rotate(90deg);stroke:var(--purple-light)}
+.branch-response{padding:12px 14px;font-size:12px;color:rgba(255,255,255,.8);line-height:1.7;background:rgba(108,92,231,.04);border-top:1px solid var(--border);display:none;font-style:italic}
+.branch-response.open{display:block}
+
+/* STEP NAV BUTTONS */
+.step-nav{display:flex;gap:8px;margin-top:8px}
+.btn-done{font-size:11px;padding:7px 14px;border-radius:7px;background:var(--green-dim);border:1px solid rgba(0,214,143,.3);color:var(--green);cursor:pointer;font-weight:700;transition:all .15s}
+.btn-done:hover{background:rgba(0,214,143,.2);color:#fff}
+.btn-skip{font-size:11px;padding:7px 14px;border-radius:7px;background:transparent;border:1px solid rgba(255,255,255,.1);color:var(--muted);cursor:pointer;transition:all .15s}
+.btn-skip:hover{border-color:rgba(255,255,255,.25);color:#fff}
+
+/* PROGRESS BAR */
+.call-progress{display:flex;gap:4px;margin-bottom:16px;align-items:center}
+.prog-step{flex:1;height:3px;border-radius:3px;background:rgba(255,255,255,.06);transition:background .3s}
+.prog-step.prog-done{background:var(--green)}
+.prog-step.prog-active{background:var(--purple)}
+.prog-label{font-size:10px;color:var(--muted);margin-left:8px;white-space:nowrap}
+
+/* SCORE BREAKDOWN */
+.score-items{display:flex;flex-direction:column;gap:7px}
+.score-item{display:flex;align-items:center;gap:10px;font-size:12px}
+.sitem-icon{width:20px;height:20px;border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:10px}
+.sitem-icon.ok{background:var(--green-dim);color:var(--green)}
+.sitem-icon.bad{background:var(--red-dim);color:var(--red)}
+.sitem-icon.warn{background:var(--orange-dim);color:var(--orange)}
+.sitem-text{flex:1;color:rgba(255,255,255,.7);line-height:1.3}
+.sitem-pts{font-size:10px;color:var(--muted)}
+
+/* TOAST */
+#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(16px);background:#1a1a2e;color:#fff;font-size:12px;font-weight:600;padding:9px 18px;border-radius:20px;transition:all .22s;z-index:600;box-shadow:0 4px 24px rgba(0,0,0,.5);white-space:nowrap;opacity:0;border:1px solid rgba(108,92,231,.25);pointer-events:none}
+#toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+
+/* SITE ANALYSIS */
+.analysis-wrap{margin-top:16px;padding-top:14px;border-top:1px solid var(--border)}
+.url-row{display:flex;gap:8px;margin-bottom:10px}
+.url-row input{flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:9px 12px;color:#fff;font-size:12px;font-family:'DM Sans',sans-serif;outline:none;transition:border-color .2s}
+.url-row input:focus{border-color:rgba(108,92,231,.4)}
+.url-row input::placeholder{color:var(--muted)}
+.btn-analyze{padding:9px 16px;border-radius:8px;background:var(--purple);border:none;color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:'Syne',sans-serif;white-space:nowrap;transition:all .15s;display:flex;align-items:center;gap:6px}
+.btn-analyze:hover{background:#7d6ef5}.btn-analyze:disabled{opacity:.5;cursor:not-allowed}
+
+/* SPINNER */
+.spinner{width:16px;height:16px;border:2px solid rgba(108,92,231,.2);border-top-color:var(--purple);border-radius:50%;animation:spin .7s linear infinite;display:inline-block}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* CALL READY BANNER */
+.call-ready{background:linear-gradient(135deg,rgba(0,214,143,.08),rgba(108,92,231,.08));border:1px solid rgba(0,214,143,.2);border-radius:12px;padding:16px;display:flex;align-items:center;gap:14px;margin-bottom:20px}
+.call-ready-icon{font-size:24px;flex-shrink:0}
+.call-ready-text{}
+.call-ready-title{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:#fff;margin-bottom:3px}
+.call-ready-sub{font-size:11px;color:var(--muted);line-height:1.5}
+
+/* TABS */
+.section-tabs{display:flex;border-bottom:1px solid var(--border)}
+.stab{flex:1;padding:11px 8px;font-size:11px;font-weight:700;font-family:'Syne',sans-serif;color:rgba(255,255,255,.32);background:transparent;border:none;cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:5px}
+.stab:hover{color:rgba(255,255,255,.6)}
+.stab.active{color:var(--purple-light);border-bottom:2px solid var(--purple);background:rgba(108,92,231,.06)}
+.stab-panel{display:none;padding:20px}
+.stab-panel.active{display:block}
+</style>
+</head>
+<body>
+<div id="cursor"></div>
+<div id="cursor-trail"></div>
+
+<nav class="topnav">
+  <a class="logo" href="app.html">
+    <div class="logo-mark">
+      <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+    </div>
+    LeadPulse
+  </a>
+  <button class="btn-back" onclick="history.back()">
+    <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+    Retour aux leads
+  </button>
+</nav>
+
+<div class="page-wrap" id="page-wrap">
+  <div class="ai-loading" style="padding:60px 0;justify-content:center">
+    <div class="spinner" style="width:28px;height:28px"></div>
+    <span style="margin-left:12px;font-size:14px">Chargement de la fiche…</span>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+// ── DATA LOAD ────────────────────────────────────────────────────────────────
+const raw = localStorage.getItem('lp_current_lead');
+let lead = null;
+try { lead = JSON.parse(raw); } catch(e) {}
+
+if (!lead) {
+  document.getElementById('page-wrap').innerHTML = `
+    <div style="text-align:center;padding:100px 20px">
+      <div style="font-size:38px;margin-bottom:16px">🤷</div>
+      <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:#fff;margin-bottom:8px">Aucun prospect chargé</div>
+      <div style="font-size:13px;color:var(--muted);margin-bottom:20px">Retourne sur la liste et clique sur un prospect.</div>
+      <a href="app.html" style="display:inline-flex;align-items:center;gap:7px;padding:10px 20px;background:var(--purple);border-radius:9px;color:#fff;font-family:'Syne',sans-serif;font-weight:700;font-size:13px;text-decoration:none">← Retour</a>
+    </div>`;
+} else {
+  renderPage(lead);
+}
+
+// ── HELPERS ──────────────────────────────────────────────────────────────────
+function esc(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function nl2br(s){ return (s||'').replace(/\n/g,'<br>'); }
+function toast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2500);
+}
+function copyText(txt,label){
+  navigator.clipboard.writeText(txt).then(()=>toast('✓ '+(label||'Copié'))).catch(()=>toast('Copie manuelle'));
+}
+function scoreClass(s){ return s>=7?'good':s>=4?'mid':'bad'; }
+function scoreColor(s){ return s>=7?'var(--green)':s>=4?'var(--orange)':'var(--red)'; }
+
+// ── RENDER PAGE ──────────────────────────────────────────────────────────────
+function renderPage(l) {
+  const sc = l.presenceScore || 0;
+  const barColor = scoreColor(sc);
+  const circleCirc = 2 * Math.PI * 34;
+  const circleDash = circleCirc * (1 - sc / 10);
+
+  const webChip = l.website
+    ? `<span class="chip chip-web">🌐 Site web</span>`
+    : `<span class="chip chip-noweb">⚠ Pas de site</span>`;
+  const sizeChip = l.effectif ? `<span class="chip chip-size">👥 ${esc(l.effectif)} sal.</span>` : '';
+  const nafChip  = l.nafLabel ? `<span class="chip chip-naf">${esc(l.nafLabel.length>35?l.nafLabel.slice(0,35)+'…':l.nafLabel)}</span>` : '';
+  const ageChip  = l.anneeCreation ? `<span class="chip chip-good">📅 Depuis ${esc(l.anneeCreation)}</span>` : '';
+
+  const html = `
+  <!-- HERO -->
+  <div class="prospect-hero">
+    <div class="ph-left">
+      <div class="ph-label">
+        <svg width="10" height="10" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4-4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        Fiche prospect
+      </div>
+      <div class="ph-name">${esc(l.name)}</div>
+      ${l.address ? `<div class="ph-address"><svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>${esc(l.address)}</div>` : ''}
+      <div class="ph-chips">${nafChip}${sizeChip}${webChip}${ageChip}</div>
+    </div>
+    <div class="ph-right">
+      <div class="score-circle">
+        <svg width="80" height="80" viewBox="0 0 80 80">
+          <circle cx="40" cy="40" r="34" fill="none" stroke="rgba(255,255,255,.07)" stroke-width="7"/>
+          <circle cx="40" cy="40" r="34" fill="none" stroke="${barColor}" stroke-width="7"
+            stroke-dasharray="${circleCirc}" stroke-dashoffset="${circleDash}" stroke-linecap="round"/>
+        </svg>
+        <div class="score-circle-num">
+          <div class="sc-num">${sc}</div>
+          <div class="sc-sub">/10</div>
+        </div>
+      </div>
+      <div class="ph-contacts">
+        ${l.phone ? `<div class="contact-item"><svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 01-2.18 2A19.79 19.79 0 013.09 4.18 2 2 0 015.09 2h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L9.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z"/></svg><a href="tel:${esc(l.phone)}">${esc(l.phone)}</a><button class="btn-copy-small" onclick="copyText('${esc(l.phone)}','Téléphone')"><svg width="10" height="10" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg></button></div>` : ''}
+        ${l.email ? `<div class="contact-item"><svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg><a href="mailto:${esc(l.email)}">${esc(l.email)}</a><button class="btn-copy-small" onclick="copyText('${esc(l.email)}','Email')"><svg width="10" height="10" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg></button></div>` : ''}
+        ${l.website ? `<div class="contact-item"><svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg><a href="${esc(l.website.startsWith('http')?l.website:'https://'+l.website)}" target="_blank">${esc(l.website.replace(/^https?:\/\/(www\.)?/,''))}</a></div>` : ''}
+      </div>
+      ${l.mapsUrl ? `<a href="${esc(l.mapsUrl)}" target="_blank" class="btn-back" style="font-size:11px"><svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>Google Maps</a>` : ''}
+    </div>
+  </div>
+
+  <!-- MAIN GRID -->
+  <div class="main-grid">
+
+    <!-- COL 1 : EMAIL + INFOS -->
+    <div style="display:flex;flex-direction:column;gap:20px">
+
+      <!-- EMAIL IA -->
+      <div class="section-card">
+        <div class="sc-head">
+          <div class="sc-title">✉ Email de prospection IA</div>
+          <button class="btn-action btn-gen" id="btn-gen-email" onclick="generateEmail()" style="font-size:11px;padding:6px 12px">
+            <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+            Générer
+          </button>
+        </div>
+        <div class="sc-body">
+          <div id="email-zone">
+            <div style="text-align:center;padding:24px 0;color:var(--muted);font-size:12px">
+              <div style="font-size:28px;margin-bottom:8px">✉</div>
+              Clique sur Générer pour créer un email personnalisé
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- FICHE INFOS -->
+      <div class="section-card">
+        <div class="sc-head">
+          <div class="sc-title">📋 Informations</div>
+        </div>
+        <div class="sc-body">
+          <div class="info-grid">
+            ${infoRow('Téléphone', l.phone ? `<a href="tel:${esc(l.phone)}">${esc(l.phone)}</a>` : null, l.phone)}
+            ${infoRow('Email', l.email ? `<a href="mailto:${esc(l.email)}">${esc(l.email)}</a>` : null, l.email)}
+            ${infoRow('Site web', l.website ? `<a href="${esc(l.website.startsWith('http')?l.website:'https://'+l.website)}" target="_blank">${esc(l.website.replace(/^https?:\/\/(www\.)?/,'').slice(0,28))}</a>` : null, l.website)}
+            ${infoRow('Effectifs', l.effectif ? esc(l.effectif)+' salariés' : null)}
+            ${infoRow('Création', l.anneeCreation ? esc(l.anneeCreation) : null)}
+            ${infoRow('SIRET', l.siret ? esc(l.siret) : null, l.siret)}
+            ${infoRow('Secteur', l.nafLabel ? esc(l.nafLabel.length>32?l.nafLabel.slice(0,32)+'…':l.nafLabel) : null)}
+            ${infoRow('Forme juridique', l.formeJuridique ? esc(l.formeJuridique) : null)}
+          </div>
+          <!-- SITE ANALYSIS -->
+          <div class="analysis-wrap">
+            <div style="font-size:11px;font-weight:600;color:rgba(255,255,255,.5);margin-bottom:10px">Analyser le site web (IA)</div>
+            <div class="url-row">
+              <input type="text" id="site-url-input" placeholder="https://exemple.fr" value="${l.website ? esc(l.website.startsWith('http')?l.website:'https://'+l.website) : ''}">
+              <button class="btn-analyze" id="analyze-btn" onclick="analyzeSite()">
+                <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+                Analyser
+              </button>
+            </div>
+            <div id="analysis-result"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SCORE DIGITAL -->
+      <div class="section-card">
+        <div class="sc-head">
+          <div class="sc-title">📊 Score de présence digitale</div>
+          <div style="font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:${barColor}">${sc}/10</div>
+        </div>
+        <div class="sc-body">
+          <div style="font-size:12px;color:var(--muted);margin-bottom:12px;padding:8px 12px;background:${sc<=3?'var(--red-dim)':sc<=6?'var(--orange-dim)':'var(--green-dim)'};border-radius:8px;border:1px solid ${sc<=3?'rgba(255,71,87,.2)':sc<=6?'rgba(255,159,67,.2)':'rgba(0,214,143,.2)'};color:${barColor}">
+            ${sc<=3?'🔴 Très faible — prospect idéal à contacter maintenant':sc<=6?'🟡 Présence partielle — plusieurs points à améliorer':'🟢 Bonne présence — argumentaire axé performance'}
+          </div>
+          <div class="score-items">
+            ${scoreItem('Site web détecté', !!l.website, 3, l.website||'Aucun site — opportunité directe !')}
+            ${scoreItem('Numéro de téléphone', !!l.phone, 2, l.phone||'Pas de téléphone dans la base')}
+            ${scoreItem('Email professionnel', !!l.email && !l.email.startsWith('contact@'), 2, l.email||'Email non disponible')}
+            ${scoreItem('Entreprise établie (+3 ans)', !!(l.anneeCreation && (new Date().getFullYear()-parseInt(l.anneeCreation))>=3), 1, l.anneeCreation?'Créée en '+l.anneeCreation:'Date inconnue')}
+            ${scoreItem('Présence Google Maps', !!l.mapsUrl, 1, 'Adresse géolocalisable')}
+            ${scoreItem('Effectifs renseignés', !!(l.effectif && l.effectif!=='0 salarié'), 1, l.effectif||'Non renseigné')}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- COL 2 : COLD CALL SCRIPT -->
+    <div class="section-card" style="height:fit-content">
+      <div class="sc-head">
+        <div class="sc-title">📞 Script Cold Call Interactif</div>
+        <button class="btn-action btn-gen" id="btn-gen-call" onclick="generateCall()" style="font-size:11px;padding:6px 12px">
+          <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+          Générer
+        </button>
+      </div>
+      <div class="sc-body" id="call-zone">
+        <div style="text-align:center;padding:24px 0;color:var(--muted);font-size:12px">
+          <div style="font-size:28px;margin-bottom:8px">📞</div>
+          Clique sur Générer pour créer un script d'appel personnalisé avec les réponses aux objections
+        </div>
+      </div>
+    </div>
+
+  </div>`;
+
+  document.getElementById('page-wrap').innerHTML = html;
+  initCursor();
+}
+
+function infoRow(label, value, copyVal) {
+  if (!value) return `<div class="info-item"><div class="info-label">${label}</div><div class="info-value na">Non disponible</div></div>`;
+  const copyBtn = copyVal ? `<button class="btn-copy-small" onclick="copyText('${esc(copyVal)}','${label}')"><svg width="10" height="10" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg></button>` : '';
+  return `<div class="info-item"><div class="info-label">${label}</div><div class="info-value">${value}${copyBtn}</div></div>`;
+}
+
+function scoreItem(label, ok, pts, tip) {
+  const cls = ok ? 'ok' : pts > 1 ? 'bad' : 'warn';
+  return `<div class="score-item">
+    <div class="sitem-icon ${cls}">${ok?'✓':'✗'}</div>
+    <div class="sitem-text">${label}<div style="font-size:10px;color:var(--muted);margin-top:1px">${esc(tip)}</div></div>
+    <div class="sitem-pts">+${ok?pts:0}/${pts}</div>
+  </div>`;
+}
+
+// ── EMAIL GENERATION ─────────────────────────────────────────────────────────
+async function generateEmail() {
+  const l = lead;
+  const zone = document.getElementById('email-zone');
+  const btn  = document.getElementById('btn-gen-email');
+  btn.disabled = true;
+  zone.innerHTML = '<div class="ai-loading"><div class="ai-dots"><div class="ai-dot"></div><div class="ai-dot"></div><div class="ai-dot"></div></div>Rédaction de l\'email en cours…</div>';
+
+  const ctx = [
+    l.nafLabel ? 'Secteur : '+l.nafLabel : '',
+    l.effectif ? 'Effectifs : '+l.effectif+' salariés' : '',
+    l.anneeCreation ? 'Créée en '+l.anneeCreation : '',
+    l.website ? 'Site web : '+l.website : 'Pas de site web détecté',
+    'Score présence digitale : '+l.presenceScore+'/10',
+    l.presenceScore <= 4 ? 'Opportunité majeure : présence digitale très faible' : '',
+  ].filter(Boolean).join('\n');
+
+  const prompt = `Tu es un expert en prospection commerciale B2B française. Rédige un email de prospection court, percutant et ultra-personnalisé.
+
+Entreprise : ${l.name}
+Adresse : ${l.address || 'non précisée'}
+${ctx}
+
+RÈGLES STRICTES :
+- Commence par "Objet : [objet percutant et précis]" puis saut de ligne
+- Accroche personnalisée qui montre que tu connais LEUR secteur et LEUR situation spécifique (pas générique)
+- Si score digital faible ou pas de site : mets en avant ce manque comme opportunité concrète de croissance
+- Corps : 3-4 phrases max — ce que tu proposes, le bénéfice concret pour eux
+- CTA clair : proposer un appel de 15 min (propose 2 créneaux spécifiques)
+- Signature : ton prénom + "Agence [nom à compléter]"
+- Ton humain, direct, naturel — pas de formules creuses
+- Maximum 130 mots au total
+
+Réponds UNIQUEMENT avec l'email, rien d'autre.`;
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:600,messages:[{role:'user',content:prompt}]})
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error?.message||'Erreur API');
+    const msg = (data.content||[]).map(b=>b.text||'').join('');
+    zone.innerHTML = `
+      <div class="msg-box" id="email-msg">${nl2br(esc(msg))}</div>
+      <div class="ai-actions">
+        <button class="btn-action btn-copy" onclick="copyText(document.getElementById('email-msg').innerText,'Email')">✓ Copier l'email</button>
+        <button class="btn-action btn-regen" onclick="generateEmail()">↺ Régénérer</button>
+      </div>`;
+  } catch(e) {
+    zone.innerHTML = `<div style="color:var(--orange);font-size:12px;padding:8px">Erreur de génération. Réessaie.</div>`;
+  }
+  btn.disabled = false;
+}
+
+// ── COLD CALL GENERATION ─────────────────────────────────────────────────────
+let callSteps = [];
+let currentStep = 0;
+
+async function generateCall() {
+  const l = lead;
+  const zone = document.getElementById('call-zone');
+  const btn  = document.getElementById('btn-gen-call');
+  btn.disabled = true;
+  zone.innerHTML = '<div class="ai-loading"><div class="ai-dots"><div class="ai-dot"></div><div class="ai-dot"></div><div class="ai-dot"></div></div>Création du script d\'appel en cours…</div>';
+
+  const ctx = [
+    l.nafLabel ? 'Secteur : '+l.nafLabel : '',
+    l.effectif ? 'Effectifs : '+l.effectif+' salariés' : '',
+    l.anneeCreation ? 'Créée en '+l.anneeCreation : '',
+    l.website ? 'Site web : '+l.website : 'Pas de site web',
+    'Score présence digitale : '+l.presenceScore+'/10',
+  ].filter(Boolean).join('\n');
+
+  const prompt = `Tu es un expert en cold calling B2B pour agences digitales françaises. Crée un script d'appel structuré en JSON pour cette entreprise.
+
+Entreprise : ${l.name}
+Adresse : ${l.address||'non précisée'}
+${ctx}
+
+Génère un objet JSON avec exactement cette structure (rien d'autre, juste le JSON) :
+{
+  "tip": "conseil de timing ou de posture pour cet appel spécifique (1 phrase)",
+  "steps": [
+    {
+      "id": "accroche",
+      "title": "Accroche",
+      "duration": "5 sec",
+      "script": "texte à dire mot pour mot",
+      "tip": "conseil pratique pour cette étape",
+      "branches": [
+        {
+          "trigger": "Si l'interlocuteur dit / réagit : [situation]",
+          "response": "Réponse adaptée mot pour mot"
+        }
+      ]
+    }
+  ]
+}
+
+ÉTAPES OBLIGATOIRES : accroche (5s), présentation (15s), pitch_valeur (20s), question_pivot (ouverture), objection_pas_interesse, objection_pas_le_temps, cta_rdv.
+
+Règles :
+- Scripts naturels et oraux (pas à l'écrit)
+- Hyper personnalisé sur le secteur "${l.nafLabel||'inconnu'}" et le score ${l.presenceScore}/10
+- ${l.presenceScore<=4 ? 'INSISTE sur l\'absence de présence digitale comme douleur principale' : 'Axe sur l\'optimisation et la performance digitale'}
+- Chaque étape : 2-3 branches d'objections/réactions plausibles avec réponses
+- Ton conversationnel, confiant, pas robotique
+- Propose un RDV spécifique (ex: "mardi ou jeudi cette semaine")
+
+RÉPONDS UNIQUEMENT AVEC LE JSON VALIDE.`;
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:2000,messages:[{role:'user',content:prompt}]})
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error?.message||'Erreur API');
+    let msg = (data.content||[]).map(b=>b.text||'').join('');
+    msg = msg.replace(/```json\n?/g,'').replace(/```\n?/g,'').trim();
+    const parsed = JSON.parse(msg);
+    callSteps = parsed.steps || [];
+    currentStep = 0;
+    renderCallScript(parsed.tip || '');
+  } catch(e) {
+    zone.innerHTML = `<div style="color:var(--orange);font-size:12px;padding:8px">Erreur de génération. Réessaie dans un instant.<br><small>${esc(e.message)}</small></div>`;
+  }
+  btn.disabled = false;
+}
+
+function renderCallScript(tip) {
+  let html = `
+  <div class="call-ready">
+    <div class="call-ready-icon">📞</div>
+    <div class="call-ready-text">
+      <div class="call-ready-title">Script prêt — Bonne chance !</div>
+      <div class="call-ready-sub">${tip ? esc(tip) : 'Suis les étapes dans l\'ordre. Coche chaque étape terminée.'}</div>
+    </div>
+  </div>
+  <div class="call-meta">
+    <div class="call-meta-chip">⏰ Meilleur moment : 8h30–9h30 ou 17h–18h30</div>
+    <div class="call-meta-chip">🧍 Reste debout, ça se sent</div>
+    <div class="call-meta-chip">🎯 ${callSteps.length} étapes</div>
+  </div>
+  <div class="call-progress" id="call-progress">
+    ${callSteps.map((_,i)=>`<div class="prog-step ${i===0?'prog-active':''}" id="prog-${i}"></div>`).join('')}
+    <span class="prog-label" id="prog-label">Étape 1/${callSteps.length}</span>
+  </div>
+  <div class="call-steps" id="call-steps">`;
+
+  callSteps.forEach((step, i) => {
+    const isFirst = i === 0;
+    html += `
+    <div class="call-step ${isFirst?'active-step':''}" id="step-${i}">
+      <div class="step-head" onclick="toggleStep(${i})">
+        <div class="step-num ${isFirst?'active':'pending'}" id="stepnum-${i}">${i+1}</div>
+        <div class="step-title">${esc(step.title)}</div>
+        <div class="step-duration">${esc(step.duration||'')}</div>
+      </div>
+      <div class="step-body ${isFirst?'open':''}" id="stepbody-${i}">
+        ${step.tip ? `<div class="step-tip">💡 ${esc(step.tip)}</div>` : ''}
+        <div class="step-script">"${esc(step.script)}"</div>
+        <button class="btn-copy-small" style="font-size:11px;padding:4px 10px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:6px;color:var(--muted)" onclick="copyText(${JSON.stringify(step.script)},'Script')">📋 Copier ce bloc</button>
+        ${step.branches && step.branches.length ? `
+        <div style="margin-top:14px">
+          <div class="branch-label">Selon la réaction…</div>
+          <div class="branches">
+            ${step.branches.map((b,bi)=>`
+            <div class="branch-item">
+              <div class="branch-trigger" id="bt-${i}-${bi}" onclick="toggleBranch(${i},${bi})">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+                ${esc(b.trigger)}
+              </div>
+              <div class="branch-response" id="br-${i}-${bi}">${esc(b.response)}</div>
+            </div>`).join('')}
+          </div>
+        </div>` : ''}
+        <div class="step-nav">
+          <button class="btn-done" onclick="markDone(${i})">✓ Étape terminée</button>
+          <button class="btn-skip" onclick="markDone(${i})">Passer →</button>
+          ${i>0?`<button class="btn-skip" onclick="goStep(${i-1})">← Retour</button>`:''}
+        </div>
+      </div>
+    </div>`;
+  });
+
+  html += `</div>
+  <div style="margin-top:14px;display:flex;gap:8px">
+    <button class="btn-action btn-regen" onclick="generateCall()" style="flex:1;justify-content:center">↺ Régénérer le script</button>
+    <button class="btn-action btn-copy btn-done" id="btn-copy-full" onclick="copyFullScript()" style="flex:1;justify-content:center">📋 Copier tout le script</button>
+  </div>`;
+
+  document.getElementById('call-zone').innerHTML = html;
+}
+
+function toggleStep(i) {
+  const body = document.getElementById('stepbody-'+i);
+  body.classList.toggle('open');
+}
+
+function toggleBranch(i, bi) {
+  const resp = document.getElementById('br-'+i+'-'+bi);
+  const trigger = document.getElementById('bt-'+i+'-'+bi);
+  const isOpen = resp.classList.contains('open');
+  resp.classList.toggle('open', !isOpen);
+  trigger.classList.toggle('expanded', !isOpen);
+}
+
+function markDone(i) {
+  // Mark current step done
+  const stepEl = document.getElementById('step-'+i);
+  const numEl  = document.getElementById('stepnum-'+i);
+  const bodyEl = document.getElementById('stepbody-'+i);
+  stepEl.classList.remove('active-step');
+  stepEl.classList.add('done-step');
+  numEl.className = 'step-num done';
+  numEl.textContent = '✓';
+  bodyEl.classList.remove('open');
+  document.getElementById('prog-'+i).className = 'prog-step prog-done';
+
+  const next = i + 1;
+  if (next < callSteps.length) {
+    goStep(next);
+  } else {
+    // All done!
+    document.getElementById('prog-label').textContent = '✓ Appel terminé !';
+    toast('🎉 Script terminé — bonne prospection !');
+  }
+}
+
+function goStep(i) {
+  currentStep = i;
+  // Update progress
+  for (let j = 0; j < callSteps.length; j++) {
+    const p = document.getElementById('prog-'+j);
+    if (!p) continue;
+    if (j < i) p.className = 'prog-step prog-done';
+    else if (j === i) p.className = 'prog-step prog-active';
+    else if (!p.classList.contains('prog-done')) p.className = 'prog-step';
+  }
+  document.getElementById('prog-label').textContent = `Étape ${i+1}/${callSteps.length}`;
+
+  const stepEl = document.getElementById('step-'+i);
+  const numEl  = document.getElementById('stepnum-'+i);
+  const bodyEl = document.getElementById('stepbody-'+i);
+  if (stepEl && !stepEl.classList.contains('done-step')) {
+    stepEl.classList.add('active-step');
+    numEl.className = 'step-num active';
+    bodyEl.classList.add('open');
+    stepEl.scrollIntoView({behavior:'smooth',block:'nearest'});
+  }
+}
+
+function copyFullScript() {
+  const lines = callSteps.map((s,i)=>`[${i+1}] ${s.title.toUpperCase()} (${s.duration||''})\n"${s.script}"\n${s.branches&&s.branches.length?s.branches.map(b=>`  → ${b.trigger}\n  "${b.response}"`).join('\n'):''}`)
+  .join('\n\n---\n\n');
+  copyText(lines, 'Script complet');
+}
+
+// ── SITE ANALYSIS ─────────────────────────────────────────────────────────────
+async function analyzeSite() {
+  const l = lead;
+  const url = (document.getElementById('site-url-input')?.value||'').trim();
+  const resultEl = document.getElementById('analysis-result');
+  const btn = document.getElementById('analyze-btn');
+  if (!url) { toast('Entre une URL à analyser'); return; }
+  btn.disabled = true;
+  btn.innerHTML = '<div class="spinner" style="width:12px;height:12px;border-width:2px"></div> Analyse…';
+  resultEl.innerHTML = '<div class="ai-loading"><div class="ai-dots"><div class="ai-dot"></div><div class="ai-dot"></div><div class="ai-dot"></div></div>Analyse en cours…</div>';
+
+  const prompt = `Tu es un expert en audit de présence digitale pour les PME françaises.
+
+Entreprise : ${l.name}
+Secteur : ${l.nafLabel||'non précisé'}
+URL : ${url}
+Effectifs : ${l.effectif||'inconnu'}
+Création : ${l.anneeCreation||'inconnue'}
+
+Donne un audit concis. FORMAT OBLIGATOIRE :
+SCORE: [X]/10
+
+POINTS FORTS:
+• [point 1]
+• [point 2]
+
+POINTS FAIBLES:
+• [problème] → impact: [conséquence]
+• [problème] → impact: [conséquence]
+
+ACCROCHE VENTE:
+[1-2 phrases d'accroche basées sur ces problèmes pour l'appel ou l'email]`;
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:600,messages:[{role:'user',content:prompt}]})
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error?.message||'Erreur');
+    const msg = (data.content||[]).map(b=>b.text||'').join('');
+    resultEl.innerHTML = `<div class="msg-box" style="margin-top:10px;font-size:12px">${nl2br(esc(msg))}</div><button class="btn-action btn-copy" style="font-size:11px;margin-top:2px" onclick="copyText(document.getElementById('analysis-result').querySelector('.msg-box').innerText,'Analyse')">✓ Copier l'analyse</button>`;
+  } catch(e) {
+    resultEl.innerHTML = `<div style="color:var(--orange);font-size:12px;margin-top:8px">Erreur d'analyse.</div>`;
+  }
+  btn.disabled = false;
+  btn.innerHTML = '<svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>Analyser';
+}
+
+// ── CURSOR ───────────────────────────────────────────────────────────────────
+function initCursor() {
+  const cursor = document.getElementById('cursor');
+  const trail  = document.getElementById('cursor-trail');
+  document.addEventListener('mousemove', function(e){
+    cursor.style.left=(e.clientX-5)+'px';cursor.style.top=(e.clientY-5)+'px';
+    setTimeout(()=>{ trail.style.left=(e.clientX-2)+'px';trail.style.top=(e.clientY-2)+'px'; },80);
+  });
+  document.addEventListener('mousedown',()=>cursor.classList.add('clicking'));
+  document.addEventListener('mouseup',()=>cursor.classList.remove('clicking'));
+  function addHover(el){
+    el.addEventListener('mouseenter',()=>cursor.classList.add('hovering'));
+    el.addEventListener('mouseleave',()=>cursor.classList.remove('hovering'));
+  }
+  document.querySelectorAll('a,button').forEach(addHover);
+  new MutationObserver(m=>m.forEach(mu=>mu.addedNodes.forEach(n=>{
+    if(n.nodeType===1){n.querySelectorAll&&n.querySelectorAll('a,button').forEach(addHover);if(n.matches&&n.matches('a,button'))addHover(n);}
+  }))).observe(document.body,{childList:true,subtree:true});
+}
+initCursor();
+</script>
+</body>
+</html>
