@@ -515,10 +515,9 @@ function parseQuery(raw) {
   const q = raw.trim().toLowerCase()
     .normalize('NFD').replace(/[\u0300-\u036f]/g,'');
 
-  // Essaye de trouver une ville connue dans la requête
   let detectedVille = null;
   let detectedDep = null;
-  let businessQuery = raw.trim(); // Requête sans la ville
+  let businessQuery = raw.trim();
 
   // Trier par longueur décroissante pour matcher "la rochelle" avant "rochelle"
   const sorted = Object.keys(VILLE_DEP).sort((a,b) => b.length - a.length);
@@ -527,10 +526,9 @@ function parseQuery(raw) {
     if (q.includes(villeNorm)) {
       detectedVille = ville;
       detectedDep = VILLE_DEP[ville];
-      // Supprimer la ville du texte de recherche pour l'API
-      // On supprime aussi les mots "à", "a", "dans" avant la ville
-      const regex = new RegExp('[àa]\\s+' + villeNorm + '|dans\\s+' + villeNorm + '|\\s+' + villeNorm + '|' + villeNorm + '\\s*', 'gi');
-      businessQuery = raw.trim().replace(regex, '').trim().replace(/\s+/g, ' ').trim();
+      // Retirer la ville + prépositions éventuelles de la query de recherche
+      const re = new RegExp('(?:[àa]\\s+|dans\\s+|\\s+)?' + villeNorm + '(?:\\s+|$)', 'gi');
+      businessQuery = raw.trim().replace(re, ' ').trim().replace(/\s+/g, ' ').trim();
       break;
     }
   }
@@ -588,16 +586,10 @@ async function doSearch() {
     // ── Parsing géographique ───────────────────────────────────────────────
     const { detectedVille, detectedDep, businessQuery } = parseQuery(q);
 
-    // Construire l'URL : utiliser businessQuery (sans la ville) pour la recherche textuelle
-    // et ajouter le paramètre commune ou département pour la géo
-    const searchTerm = businessQuery || q;
+    // On envoie le secteur/nom sans la ville dans q, et le département en filtre API
+    const searchTerm = (businessQuery && businessQuery.length > 1) ? businessQuery : q;
     let url1 = 'https://recherche-entreprises.api.gouv.fr/search?q=' + encodeURIComponent(searchTerm) + '&per_page=25&minimal=false';
-    if (detectedVille) {
-      // Utiliser le paramètre commune pour filtrer géographiquement côté API
-      // La plupart des grandes villes ont leur libellé standardisé
-      const communeApi = detectedVille.replace(/-/g,' ').replace(/\b\w/g, c => c.toUpperCase());
-      url1 += '&commune=' + encodeURIComponent(communeApi);
-    } else if (detectedDep) {
+    if (detectedDep) {
       url1 += '&departement=' + detectedDep;
     }
 
@@ -607,10 +599,9 @@ async function doSearch() {
     let results1 = d1.results || [];
 
     // ── Post-filtre géographique côté client ───────────────────────────────
-    // Si une ville est détectée, on ne garde que les établissements dans la bonne commune/dept
     if (detectedVille && results1.length > 0) {
       const villeNorm = detectedVille.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
-      // Mots significatifs de la ville (ignorer "la", "le", "les", "sur", "de")
+      // Mots significatifs de la ville (on ignore les articles)
       const stopWords = new Set(['la','le','les','sur','de','du','des','en','au','aux']);
       const villeWords = villeNorm.split(/[\s-]+/).filter(w => w.length > 1 && !stopWords.has(w));
       const filtered = results1.filter(r => {
@@ -618,12 +609,9 @@ async function doSearch() {
         const commune = (s.libelle_commune || '').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
         const cp = (s.code_postal || '').substring(0,2);
         const depStr = detectedDep ? String(detectedDep).padStart(2,'0') : '';
-        // Matcher sur au moins un mot significatif de la ville dans la commune
         const communeMatch = villeWords.some(w => commune.includes(w));
-        const depMatch = depStr && cp === depStr;
-        return communeMatch || depMatch;
+        return communeMatch || (depStr && cp === depStr);
       });
-      // N'utiliser le filtre que si on a des résultats — sinon garder les résultats bruts
       if (filtered.length > 0) results1 = filtered;
     }
 
