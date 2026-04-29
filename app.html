@@ -562,7 +562,7 @@ function resolveNom(r) {
 }
 
 // ─────────────────────────────────────
-//  SEARCH — MULTI-SOURCE
+//  SEARCH — via api/search.js (enrichi)
 // ─────────────────────────────────────
 async function doSearch() {
   if (searchCount >= FREE_LIMIT) {
@@ -580,75 +580,53 @@ async function doSearch() {
   currentLeads = [];
   expandedCards = {};
   try {
-    // ── Parsing géographique ───────────────────────────────────────────────
-    const { detectedVille, detectedDep } = parseQuery(q);
-
-    // Construire l'URL avec filtre département si détecté
-    let url1 = 'https://recherche-entreprises.api.gouv.fr/search?q=' + encodeURIComponent(q) + '&per_page=25&minimal=false';
-    if (detectedDep) {
-      url1 += '&departement=' + detectedDep;
-    }
-
-    const r1 = await fetch(url1);
-    if (!r1.ok) throw new Error('API entreprises indisponible (status '+r1.status+')');
-    const d1 = await r1.json();
-    let results1 = d1.results || [];
-
-    // ── Post-filtre géographique côté client ───────────────────────────────
-    // Si une ville est détectée, on ne garde que les établissements dans la bonne commune/dept
-    if (detectedVille && results1.length > 0) {
-      const villeNorm = detectedVille.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
-      const filtered = results1.filter(r => {
-        const s = r.siege || {};
-        const commune = (s.libelle_commune || '').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
-        const cp = (s.code_postal || '').substring(0,2);
-        const depStr = detectedDep ? String(detectedDep).padStart(2,'0') : '';
-        // Matcher sur la commune OU le département
-        return commune.includes(villeNorm.split(' ').pop()) || (depStr && cp === depStr);
-      });
-      // N'utiliser le filtre que si on a des résultats — sinon garder les résultats bruts
-      if (filtered.length > 0) results1 = filtered;
-    }
-
-    // Mapper les résultats
-    currentLeads = results1.map(function(r) {
-      const s = r.siege || {};
-
-      // ── Nom commercial prioritaire ────────────────────────────────────────
-      const nom = resolveNom(r);
-
-      const adresse = [s.numero_voie, s.indice_repetition_etablissement, s.type_voie, s.libelle_voie, s.complement_adresse, s.code_postal, s.libelle_commune].filter(Boolean).join(' ');
-      
-      const phone = s.telephone || r.telephone || '';
-      const website = s.website || r.website || s.url || r.url || '';
-      const email = s.email || r.email || guessEmail(nom, website);
-      const effectif = formatEffectif(r.tranche_effectif_salarie || s.tranche_effectif_salarie);
-      const ca = r.chiffre_affaires || null;
-      const anneeCreation = r.date_creation ? r.date_creation.substring(0,4) : null;
-      const nafLabel = r.libelle_activite_principale || s.libelle_activite_principale || '';
-      const nafCode = r.activite_principale || s.activite_principale || '';
-      
-      const lead = {
-        name: nom,
-        address: adresse,
-        phone,
-        website,
-        email: email || guessEmail(nom, website),
-        effectif,
-        ca,
-        anneeCreation,
-        nafLabel,
-        nafCode,
-        siret: s.siret || '',
-        siren: r.siren || '',
-        commune: s.libelle_commune || '',
-        mapsUrl: adresse ? 'https://www.google.com/maps/search/'+encodeURIComponent(adresse) : '',
-        formeJuridique: r.nature_juridique || '',
-        presenceScore: 0,
-      };
-      lead.presenceScore = quickPresenceScore(lead);
-      return lead;
+    // ── Appel à notre backend enrichi (Pappers + Google Places + Brandfetch) ─
+    const res = await fetch('/api/search', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ query: q }),
     });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || 'Erreur serveur (' + res.status + ')');
+    }
+    const data = await res.json();
+    const places = data.places || [];
+
+    if (places.length === 0) {
+      showError('Aucun résultat pour "' + q + '". Essaie avec un nom d\'entreprise ou un secteur différent.');
+      setLoading(false);
+      return;
+    }
+
+    // Les leads arrivent déjà enrichis depuis le serveur
+    currentLeads = places.map(p => ({
+      name:           p.name || 'Entreprise inconnue',
+      address:        p.address || '',
+      phone:          p.phone || '',
+      website:        p.website || '',
+      email:          p.email || '',
+      effectif:       p.effectif || '',
+      ca:             p.ca || null,
+      capital:        p.capital || '',
+      anneeCreation:  p.anneeCreation || '',
+      nafLabel:       p.nafLabel || '',
+      nafCode:        p.nafCode || '',
+      formeJuridique: p.formeJuridique || '',
+      dirigeant:      p.dirigeant || '',
+      siret:          p.siret || '',
+      siren:          p.siren || '',
+      commune:        (p.address || '').split(' ').pop() || '',
+      mapsUrl:        p.googleMapsUrl || p.mapsUrl || '',
+      // Nouveaux champs enrichis
+      googleRating:       p.googleRating || null,
+      googleReviewsCount: p.googleReviewsCount || null,
+      instagram:          p.instagram || '',
+      linkedin:           p.linkedin || '',
+      twitter:            p.twitter || '',
+      facebook:           p.facebook || '',
+      presenceScore:      p.presenceScore || 0,
+    }));
 
     searchCount++;
     localStorage.setItem(STORAGE_KEY, searchCount);
